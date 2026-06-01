@@ -38,6 +38,7 @@ https://vincent-zhengwen.github.io/product-listing-agent-case-study/
 ├── docs/
 │   ├── agent-capabilities.md     # Agent 核心能力说明
 │   ├── engineering-architecture.md # 工程架构与演进说明
+│   ├── evaluation-and-lessons.md # 评估标准与迭代经验
 │   └── io-contract.md            # 输入输出结构说明
 └── examples/
     └── tablecloth/               # 棉麻桌布案例输入输出摘要
@@ -47,6 +48,7 @@ https://vincent-zhengwen.github.io/product-listing-agent-case-study/
 
 - [Agent 核心能力](docs/agent-capabilities.md)
 - [工程架构与演进](docs/engineering-architecture.md)
+- [评估与迭代经验](docs/evaluation-and-lessons.md)
 - [输入输出结构](docs/io-contract.md)
 - [桌布案例输入输出](examples/tablecloth/README.md)
 
