@@ -1,0 +1,47 @@
+{
+  "listing": {
+    "title": "棉麻花朵桌布地中海风长方形餐桌台布",
+    "attributes": {
+      "材质": "棉麻",
+      "类别": "桌布",
+      "风格": "地中海风",
+      "形状": "长方形",
+      "颜色分类": "奈良油画风 / 大丽花 / 白须花边",
+      "规格尺寸": "60*60cm 至 140*360cm 多规格"
+    },
+    "main_image_jobs": [
+      "铺桌首图",
+      "尺寸规格",
+      "面料纹理",
+      "边缘垂坠",
+      "浅底确认"
+    ],
+    "assets": {
+      "main_images": [
+        "../../demo/assets/main_1.jpg",
+        "../../demo/assets/main_2.jpg",
+        "../../demo/assets/main_3.jpg",
+        "../../demo/assets/main_4.jpg",
+        "../../demo/assets/main_5.jpg"
+      ],
+      "detail_images": [
+        "../../demo/assets/detail_01.jpg",
+        "../../demo/assets/detail_02.jpg",
+        "../../demo/assets/detail_03.jpg",
+        "../../demo/assets/detail_04.jpg",
+        "../../demo/assets/detail_05.jpg",
+        "../../demo/assets/detail_06.jpg",
+        "../../demo/assets/detail_07.jpg",
+        "../../demo/assets/detail_08.jpg"
+      ],
+      "detail_full": "../../demo/assets/detail_full.jpg"
+    }
+  },
+  "transformation_summary": [
+    "从原始标题中保留材质、类目、风格和规格相关事实。",
+    "移除代理、代发、跨境采购、开票等供货语境。",
+    "按桌布类目的购买决策组织主图任务。",
+    "将多规格和款式信息放入详情页后段确认。",
+    "交付一套可用于展示和复核的完整商品页资产。"
+  ]
+}

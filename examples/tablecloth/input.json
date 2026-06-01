@@ -1,0 +1,52 @@
+{
+  "source": {
+    "platform": "yiwugo",
+    "url": "https://www.yiwugo.com/product/detail/982191293.html",
+    "title": "跨境棉麻加厚彩色桌布花朵异域东南亚台布盖布聚会派对野餐垫北美_毓喜喜悦家纺抱枕（桌布）",
+    "category_hint": "桌布 / 家纺软装",
+    "source_context_sample": [
+      "工厂诚招代理",
+      "支持一件代发",
+      "专供跨境和亚马逊",
+      "欢迎 FBA 采购",
+      "开票另加税点",
+      "支持上门验厂"
+    ],
+    "publishable_facts": {
+      "product_subject": "棉麻彩色桌布",
+      "material": "棉麻",
+      "shape": "长方形",
+      "style": "地中海风",
+      "color_or_pattern": [
+        "奈良油画风",
+        "大丽花",
+        "白须花边"
+      ],
+      "sizes": [
+        "60*60cm",
+        "90*90cm",
+        "140*140cm",
+        "140*180cm",
+        "140*220cm",
+        "140*360cm"
+      ]
+    }
+  },
+  "request": {
+    "target_platform": "taobao",
+    "deliverables": [
+      "title",
+      "attributes",
+      "main_images",
+      "detail_images",
+      "detail_full"
+    ],
+    "constraints": [
+      "保留可验证商品事实",
+      "移除批发供货语境",
+      "主图围绕桌布购买决策规划",
+      "详情图补充场景、规格、材质和服务信息",
+      "不虚构材质、尺寸、认证或功效"
+    ]
+  }
+}

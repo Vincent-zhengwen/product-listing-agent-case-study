@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商品上架内容生成 Agent 案例</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --ink: #191815;
+      --muted: #6c675f;
+      --paper: #fbfaf7;
+      --band: #f1eee8;
+      --line: #ded8cc;
+      --green: #174f43;
+      --green-soft: #e1eee9;
+      --coral: #c95b3d;
+      --amber: #d89b2b;
+      --blue: #27667a;
+      --white: #ffffff;
+      --shadow: 0 18px 45px rgba(32, 26, 18, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.58;
+    }
+
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    main { overflow: hidden; }
+
+    .hero {
+      min-height: 86vh;
+      display: grid;
+      align-items: end;
+      position: relative;
+      color: var(--white);
+      background:
+        linear-gradient(90deg, rgba(20, 18, 14, 0.78), rgba(20, 18, 14, 0.36) 52%, rgba(20, 18, 14, 0.12)),
+        url("assets/main_1.jpg") center / cover no-repeat;
+    }
+
+    .hero-inner {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 72px 0 76px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 5px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.46);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      max-width: 850px;
+      margin: 24px 0 18px;
+      font-size: 56px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 20px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      background: var(--white);
+      color: var(--ink);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+      backdrop-filter: blur(8px);
+    }
+
+    .section {
+      padding: 74px 0;
+      background: var(--paper);
+    }
+
+    .section.alt { background: var(--band); }
+
+    .wrap {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.55fr);
+      gap: 42px;
+      align-items: end;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 18px;
+      min-height: 118px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--green);
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .before-after {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-body { padding: 22px; }
+
+    .panel h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .source-img {
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .noise-list,
+    .keep-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 14px;
+      background: #f6ece8;
+      color: #8d3d28;
+      border: 1px solid #efcebf;
+    }
+
+    .chip.keep {
+      background: var(--green-soft);
+      color: var(--green);
+      border-color: #c4ded4;
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .decision {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 140px;
+      background: #fffdf9;
+    }
+
+    .decision b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green);
+      font-size: 16px;
+    }
+
+    .decision span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .asset-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .asset-tile {
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+      border: 1px solid var(--line);
+    }
+
+    .asset-tile img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
+
+    .asset-tile figcaption {
+      min-height: 62px;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .listing-layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .listing-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 22px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .listing-title {
+      margin: 0 0 18px;
+      font-size: 24px;
+      line-height: 1.28;
+      font-weight: 800;
+    }
+
+    .attrs {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .attr {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ece5da;
+      font-size: 14px;
+    }
+
+    .attr span:first-child {
+      color: var(--muted);
+    }
+
+    .detail-wall {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .detail-wall figure,
+    .asset-strip figure {
+      margin: 0;
+    }
+
+    .detail-wall figure {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    .detail-wall img {
+      width: 100%;
+      aspect-ratio: 750 / 980;
+      object-fit: cover;
+      object-position: top;
+    }
+
+    .detail-wall figcaption {
+      min-height: 52px;
+      padding: 9px 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .full-detail {
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    .full-detail-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .full-detail-header b { font-size: 16px; }
+    .full-detail-header span { color: var(--muted); font-size: 14px; }
+
+    .full-detail-scroll {
+      max-height: 680px;
+      overflow: auto;
+      background: #eee9df;
+      display: grid;
+      justify-items: center;
+    }
+
+    .full-detail-scroll img {
+      width: min(750px, 100%);
+      max-width: 100%;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .compare-item {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--white);
+      padding: 18px;
+      min-height: 180px;
+    }
+
+    .compare-item h3 {
+      margin: 0 0 12px;
+      color: var(--green);
+      font-size: 18px;
+    }
+
+    .compare-item ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .compare-item li + li { margin-top: 8px; }
+
+    .footer {
+      padding: 34px 0;
+      color: var(--muted);
+      background: var(--ink);
+    }
+
+    .footer .wrap {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .hero { min-height: 78vh; }
+      h1 { font-size: 42px; }
+      .hero p { font-size: 18px; }
+      .section-head,
+      .before-after,
+      .listing-layout {
+        grid-template-columns: 1fr;
+      }
+      .listing-card { position: static; }
+      .metrics,
+      .asset-strip,
+      .comparison {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-inner,
+      .wrap { width: min(100% - 28px, 1180px); }
+      .hero-inner { padding: 54px 0 58px; }
+      h1 { font-size: 34px; }
+      h2 { font-size: 28px; }
+      .section { padding: 54px 0; }
+      .metrics,
+      .asset-strip,
+      .decision-grid,
+      .detail-wall,
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+      .attr { grid-template-columns: 78px 1fr; }
+      .footer .wrap { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <span class="eyebrow">AI 商品上架 Agent</span>
+        <h1>把货源链接变成可发布的商品页</h1>
+        <p>AI 商品上架 Agent 读取义乌购货源, 提取真实商品事实, 生成淘宝可用的标题、属性、主图、详情页和详情长图。</p>
+        <div class="hero-actions">
+          <a class="button" href="#assets">查看生成结果</a>
+          <a class="button secondary" href="#before">查看处理流程</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="summary">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>一次完整的商品上架生成</h2>
+          </div>
+          <p class="lead">从一个真实货源页出发, Agent 完成商品理解、素材编排、买家文案和详情页生成, 交付一套可继续用于电商发布的内容资产。</p>
+        </div>
+        <div class="metrics">
+          <div class="metric"><b>1</b><span>条货源链接输入</span></div>
+          <div class="metric"><b>5</b><span>张淘宝主图</span></div>
+          <div class="metric"><b>8</b><span>屏商品详情图</span></div>
+          <div class="metric"><b>1</b><span>张详情长图</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="before">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>从供应链资料到消费者商品页</h2>
+          </div>
+          <p class="lead">货源页负责提供商品与供给信息; 上架 Agent 负责把它整理成面向买家的页面结构、视觉任务和可信商品表达。</p>
+        </div>
+        <div class="before-after">
+          <article class="panel">
+            <img class="source-img" src="assets/source-original.jpg" alt="原始货源桌布图片">
+            <div class="panel-body">
+              <h3>货源输入: 义乌购商品页</h3>
+              <p>同一个页面里同时包含商品图、规格参数、供货方式和跨境批发信息。</p>
+              <div class="noise-list" aria-label="供应链信息">
+                <span class="chip">工厂诚招代理</span>
+                <span class="chip">支持一件代发</span>
+                <span class="chip">专供跨境和亚马逊</span>
+                <span class="chip">欢迎 FBA 采购</span>
+                <span class="chip">开票另加税点</span>
+                <span class="chip">支持上门验厂</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-body">
+              <h3>上架编排: 商品事实与页面结构</h3>
+              <p>Agent 提取可发布事实, 再按桌布类目的购买决策组织标题、主图、属性和详情节奏。</p>
+              <div class="keep-list" aria-label="保留的商品事实">
+                <span class="chip keep">材质: 棉麻</span>
+                <span class="chip keep">品类: 桌布</span>
+                <span class="chip keep">风格: 地中海风</span>
+                <span class="chip keep">形状: 长方形</span>
+                <span class="chip keep">颜色: 大丽花白须花边</span>
+                <span class="chip keep">尺寸: 多规格</span>
+              </div>
+              <div class="decision-grid" style="margin-top:20px">
+                <div class="decision">
+                  <b>商品聚焦</b>
+                  <span>页面围绕桌布本体展开, 餐具与陈列物只帮助呈现使用效果。</span>
+                </div>
+                <div class="decision">
+                  <b>视觉任务</b>
+                  <span>铺桌首图、尺寸规格、面料纹理、边缘垂坠、浅底确认。</span>
+                </div>
+                <div class="decision">
+                  <b>买家表达</b>
+                  <span>供应链话术转为餐桌效果、面料质感、尺寸选择和日常使用场景。</span>
+                </div>
+                <div class="decision">
+                  <b>可信发布</b>
+                  <span>材质、尺寸、颜色和功能来自货源事实, 页面表达保持可核验。</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assets">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>生成后的商品上架包</h2>
+          </div>
+          <p class="lead">输出不止是一段文案, 而是一套商品发布素材: 标题、属性、5 张主图、8 屏详情和一张完整详情长图。</p>
+        </div>
+
+        <div class="asset-strip">
+          <figure class="asset-tile">
+            <img src="assets/main_1.jpg" alt="桌布主图 1">
+            <figcaption>铺桌首图: 餐区效果先被看见</figcaption>
+          </figure>
+          <figure class="asset-tile">
+            <img src="assets/main_2.jpg" alt="桌布主图 2">
+            <figcaption>尺寸规格: 帮买家判断桌面适配</figcaption>
+          </figure>
+          <figure class="asset-tile">
+            <img src="assets/main_3.jpg" alt="桌布主图 3">
+            <figcaption>面料纹理: 近看花枝与布面</figcaption>
+          </figure>
+          <figure class="asset-tile">
+            <img src="assets/main_4.jpg" alt="桌布主图 4">
+            <figcaption>边缘垂坠: 展示白须花边</figcaption>
+          </figure>
+          <figure class="asset-tile">
+            <img src="assets/main_5.jpg" alt="桌布主图 5">
+            <figcaption>浅底确认: 规格图清爽收口</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="wrap">
+        <div class="listing-layout">
+          <aside class="listing-card">
+            <h2 class="listing-title">棉麻花朵桌布地中海风长方形餐桌台布</h2>
+            <p class="lead">花朵图案棉麻桌布, 适合复古餐区、民宿餐桌、聚会布置和日常餐桌换季。</p>
+            <div class="attrs">
+              <div class="attr"><span>材质</span><strong>棉麻</strong></div>
+              <div class="attr"><span>类别</span><strong>桌布</strong></div>
+              <div class="attr"><span>风格</span><strong>地中海风</strong></div>
+              <div class="attr"><span>形状</span><strong>长方形</strong></div>
+              <div class="attr"><span>颜色</span><strong>奈良油画风 / 大丽花 / 白须花边</strong></div>
+              <div class="attr"><span>尺寸</span><strong>60*60cm 至 140*360cm 多规格</strong></div>
+            </div>
+          </aside>
+
+          <div>
+            <div class="detail-wall">
+              <figure><img src="assets/detail_01.jpg" alt="详情图 1"><figcaption>首屏: 铺上桌后的餐区完整感</figcaption></figure>
+              <figure><img src="assets/detail_02.jpg" alt="详情图 2"><figcaption>面料: 棉麻纹理和花枝图案</figcaption></figure>
+              <figure><img src="assets/detail_03.jpg" alt="详情图 3"><figcaption>边缘: 白须花边与垂坠效果</figcaption></figure>
+              <figure><img src="assets/detail_04.jpg" alt="详情图 4"><figcaption>尺寸: 规格选择前置说明</figcaption></figure>
+              <figure><img src="assets/detail_05.jpg" alt="详情图 5"><figcaption>场景: 餐桌、窗边和近看组合</figcaption></figure>
+              <figure><img src="assets/detail_06.jpg" alt="详情图 6"><figcaption>图案: 花朵纹样覆盖完整</figcaption></figure>
+              <figure><img src="assets/detail_07.jpg" alt="详情图 7"><figcaption>信息: 材质、功能、颜色、尺寸</figcaption></figure>
+              <figure><img src="assets/detail_08.jpg" alt="详情图 8"><figcaption>服务: 售后与发货信息收口</figcaption></figure>
+            </div>
+
+            <div class="full-detail">
+              <div class="full-detail-header">
+                <b>详情长图</b>
+                <span>750px 宽, 8 屏拼接</span>
+              </div>
+              <div class="full-detail-scroll">
+                <img src="assets/detail_full.jpg" alt="桌布详情长图">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>这套 Agent 解决了什么</h2>
+          </div>
+          <p class="lead">面向商家的价值很直接: 少做重复整理, 更快把货源资料变成买家能看懂、平台能发布的商品页。</p>
+        </div>
+        <div class="comparison">
+          <article class="compare-item">
+            <h3>货源理解</h3>
+            <ul>
+              <li>识别桌布主体、材质、规格、颜色和功能信息。</li>
+              <li>把供货侧资料整理成商品发布所需字段。</li>
+            </ul>
+          </article>
+          <article class="compare-item">
+            <h3>类目化视觉规划</h3>
+            <ul>
+              <li>按桌布购买链路安排铺桌、尺寸、纹理、垂坠和浅底图。</li>
+              <li>详情页前半段看效果, 后半段确认规格与服务。</li>
+            </ul>
+          </article>
+          <article class="compare-item">
+            <h3>可发布内容交付</h3>
+            <ul>
+              <li>标题、属性、主图、详情图和详情长图一次生成。</li>
+              <li>文案围绕商品事实表达, 更适合消费者阅读。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>商品上架内容生成 Agent 案例</span>
+      <a href="https://www.yiwugo.com/product/detail/982191293.html" target="_blank" rel="noreferrer">查看货源链接</a>
+    </div>
+  </footer>
+</body>
+</html>
