@@ -6,6 +6,10 @@
 
 ## 演示页面
 
+在线打开:
+
+https://vincent-zhengwen.github.io/product-listing-agent-case-study/
+
 本地直接打开:
 
 `demo/index.html`
