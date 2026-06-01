@@ -7,6 +7,3 @@ output/
 tmp/
 *.sqlite
 *.sqlite-*
-eval-platform-lite/backend/*.db*
-eval-platform-lite/backend/.venv/
-eval-platform-lite/frontend/.next/
