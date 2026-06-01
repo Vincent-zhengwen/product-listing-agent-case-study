@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商品上架 Agent 四阶段演进</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --ink: #16181d;
+      --muted: #5f6673;
+      --paper: #f6f8fb;
+      --white: #ffffff;
+      --line: #d7dee8;
+      --band: #e8eef4;
+      --green: #145847;
+      --green-soft: #e2eee9;
+      --red: #b6422e;
+      --red-soft: #f4e3de;
+      --blue: #245c78;
+      --blue-soft: #dfeaf0;
+      --gold: #9b6c1f;
+      --gold-soft: #f2e8ce;
+      --shadow: 0 16px 36px rgba(21, 24, 29, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.62;
+    }
+
+    a { color: inherit; }
+    button { font: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .hero {
+      min-height: 76vh;
+      display: grid;
+      align-items: end;
+      color: var(--white);
+      background:
+        linear-gradient(90deg, rgba(12, 15, 18, 0.86), rgba(12, 15, 18, 0.52) 54%, rgba(12, 15, 18, 0.18)),
+        url("../demo/assets/main_1.jpg") center / cover no-repeat;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .hero-inner { padding: 76px 0 72px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 5px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 24px 0 18px;
+      font-size: 56px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 20px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      background: var(--white);
+      color: var(--ink);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+    }
+
+    .section {
+      padding: 74px 0;
+      background: var(--paper);
+    }
+
+    .section.alt { background: var(--band); }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(300px, 0.58fr);
+      gap: 42px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .flow-step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 18px;
+      min-height: 154px;
+    }
+
+    .flow-step span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .flow-step h3 {
+      margin: 14px 0 8px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .flow-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .case-browser {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .stage-tabs {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .stage-tab {
+      width: 100%;
+      min-height: 86px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(21, 24, 29, 0.06);
+    }
+
+    .stage-tab:focus-visible {
+      outline: 3px solid rgba(36, 92, 120, 0.34);
+      outline-offset: 2px;
+    }
+
+    .stage-tab[aria-selected="true"] {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .tab-number {
+      display: block;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .stage-tab[aria-selected="true"] .tab-number {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .tab-name {
+      display: block;
+      margin-top: 4px;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.22;
+    }
+
+    .tab-case {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stage-tab[aria-selected="true"] .tab-case {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .stage-panels { min-width: 0; }
+
+    .stage-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .stage-panel[hidden] { display: none; }
+
+    .panel-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(280px, 0.48fr);
+      gap: 26px;
+      align-items: start;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stage-kicker,
+    .panel-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .pill.warn {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .pill.case {
+      background: var(--gold-soft);
+      color: var(--gold);
+    }
+
+    .stage-panel h3 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .stage-summary {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .panel-facts {
+      display: grid;
+      gap: 10px;
+    }
+
+    .fact {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: #fbfcfe;
+    }
+
+    .fact b {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .fact p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .case-story {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 24px 0 30px;
+    }
+
+    .story-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 15px;
+      background: #fbfcfe;
+    }
+
+    .story-item b {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .story-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .architecture-map {
+      margin: 26px 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 18px;
+    }
+
+    .architecture-map h4,
+    .evidence-board h4 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      line-height: 1.24;
+    }
+
+    .arch-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .arch-step {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 14px;
+      min-height: 112px;
+    }
+
+    .arch-step + .arch-step::before {
+      content: "";
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      width: 10px;
+      border-top: 2px solid var(--blue);
+    }
+
+    .arch-step b {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .arch-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .evidence-board {
+      display: grid;
+      grid-template-columns: minmax(0, 0.7fr) minmax(260px, 0.3fr);
+      gap: 14px;
+      margin: 0 0 30px;
+    }
+
+    .evidence-table,
+    .problem-callout {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 16px;
+    }
+
+    .evidence-row {
+      display: grid;
+      grid-template-columns: 128px minmax(0, 1fr);
+      gap: 12px;
+      padding: 11px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .evidence-row:first-of-type { border-top: 0; }
+
+    .evidence-row b,
+    .problem-callout b {
+      font-size: 14px;
+    }
+
+    .evidence-row span,
+    .problem-callout p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .problem-callout p {
+      margin: 8px 0 0;
+    }
+
+    .gallery-section + .gallery-section { margin-top: 30px; }
+
+    .gallery-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+
+    .gallery-head h4 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.24;
+    }
+
+    .gallery-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .main-gallery {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .detail-gallery {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .media-tile {
+      position: relative;
+      display: block;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #eef2f6;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .media-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .main-gallery .media-tile { aspect-ratio: 1; }
+    .detail-gallery .media-tile { aspect-ratio: 3 / 4; }
+
+    .media-tile::after {
+      content: "打开大图";
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(22, 24, 29, 0.76);
+      color: #fff;
+      font-size: 12px;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .media-tile:hover::after,
+    .media-tile:focus-visible::after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .media-label {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      z-index: 1;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--red-soft);
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .full-detail {
+      display: grid;
+      grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+      gap: 16px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 16px;
+    }
+
+    .full-detail p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .full-detail .media-tile {
+      max-height: 620px;
+      overflow: auto;
+    }
+
+    .full-detail img {
+      width: 100%;
+      height: auto;
+    }
+
+    .summary-band {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(280px, 0.5fr);
+      gap: 34px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-band p {
+      margin: 12px 0 0;
+      color: var(--muted);
+    }
+
+    .link-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .link-stack .button {
+      border-color: var(--line);
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .link-stack .button.secondary {
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    footer {
+      padding: 28px 0 40px;
+      color: var(--muted);
+      background: var(--paper);
+      font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+      h1 { font-size: 42px; }
+      .section-head,
+      .case-browser,
+      .panel-head,
+      .summary-band,
+      .full-detail {
+        grid-template-columns: 1fr;
+      }
+      .stage-tabs {
+        position: static;
+        grid-template-columns: repeat(4, minmax(180px, 1fr));
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .stage-tab { min-height: 92px; }
+      .flow,
+      .case-story,
+      .arch-steps,
+      .evidence-board {
+        grid-template-columns: 1fr 1fr;
+      }
+      .main-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .detail-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 28px, 1180px); }
+      .hero { min-height: 72vh; }
+      .hero-inner { padding: 58px 0 54px; }
+      h1 { font-size: 34px; }
+      .hero p { font-size: 17px; }
+      .section { padding: 54px 0; }
+      .stage-panel { padding: 20px; }
+      .stage-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow-x: visible;
+      }
+      .stage-tab {
+        min-height: 112px;
+        padding: 12px;
+      }
+      .flow,
+      .case-story,
+      .arch-steps,
+      .evidence-board,
+      .main-gallery,
+      .detail-gallery {
+        grid-template-columns: 1fr;
+      }
+      .arch-step + .arch-step::before { display: none; }
+      .evidence-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .gallery-head {
+        display: grid;
+        gap: 4px;
+      }
+      .summary-band { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow">商品上架 Agent 架构演进案例</span>
+        <h1>从 Workflow 到 Claude Agent SDK</h1>
+        <p>同一个目标：把 B2B 货源链接转成可发布的 C 端商品素材。每一阶段都来自真实交付问题，而不是为了追逐架构名词。</p>
+        <div class="hero-actions">
+          <a class="button" href="#case-browser">查看四阶段 Case</a>
+          <a class="button secondary" href="../demo/">查看最终桌布 Demo</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>这不是一次生成结果，而是一条被失败推出来的工程路径</h2>
+          <p class="lead">早期页面能生成内容，但像模板；中期 Agent 会用工具，却容易半成品；多专职 Agent 让结构完整，但最终交付仍要围绕 artifact 做验证。SDK 阶段把这些经验沉淀成 playbook 和检查循环。</p>
+        </div>
+        <div class="flow" aria-label="四阶段概览">
+          <article class="flow-step">
+            <span>01</span>
+            <h3>Workflow</h3>
+            <p>先把从货源到上架素材的确定流程跑通。</p>
+          </article>
+          <article class="flow-step">
+            <span>02</span>
+            <h3>单 Agent + 多工具</h3>
+            <p>让 Agent 主动看货源、看图、调工具。</p>
+          </article>
+          <article class="flow-step">
+            <span>03</span>
+            <h3>多专职 Agent</h3>
+            <p>拆开研究、策略、文案、图片和质检职责。</p>
+          </article>
+          <article class="flow-step">
+            <span>04</span>
+            <h3>Claude Agent SDK</h3>
+            <p>围绕最终资产持续执行、验证和修正。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="case-browser">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>四个真实 case，按阶段完整展开</h2>
+          <p class="lead">每个阶段先讲清 Agent 架构，再用真实 case 的字段、问题和图片资产做证据。重点不是“图片很多”，而是看清系统边界为什么一次次被重划。</p>
+        </div>
+
+        <div class="case-browser">
+          <div class="stage-tabs" role="tablist" aria-label="四阶段 case 切换">
+            <button class="stage-tab" type="button" role="tab" id="stage-tab-workflow" aria-selected="true" aria-controls="stage-panel-workflow" data-stage-target="workflow">
+              <span class="tab-number">01</span>
+              <span class="tab-name">Workflow</span>
+              <span class="tab-case">listing #18 花瓶</span>
+            </button>
+            <button class="stage-tab" type="button" role="tab" id="stage-tab-single-agent" aria-selected="false" aria-controls="stage-panel-single-agent" tabindex="-1" data-stage-target="single-agent">
+              <span class="tab-number">02</span>
+              <span class="tab-name">单 Agent + 多工具</span>
+              <span class="tab-case">listing #55 桌布</span>
+            </button>
+            <button class="stage-tab" type="button" role="tab" id="stage-tab-multi-agent" aria-selected="false" aria-controls="stage-panel-multi-agent" tabindex="-1" data-stage-target="multi-agent">
+              <span class="tab-number">03</span>
+              <span class="tab-name">多专职 Agent</span>
+              <span class="tab-case">listing #94 小夜灯</span>
+            </button>
+            <button class="stage-tab" type="button" role="tab" id="stage-tab-sdk" aria-selected="false" aria-controls="stage-panel-sdk" tabindex="-1" data-stage-target="sdk">
+              <span class="tab-number">04</span>
+              <span class="tab-name">Claude Agent SDK</span>
+              <span class="tab-case">桌布 HTML demo</span>
+            </button>
+          </div>
+
+          <div class="stage-panels">
+            <!-- stage-panel:workflow:start -->
+            <article class="stage-panel" id="stage-panel-workflow" role="tabpanel" aria-labelledby="stage-tab-workflow" data-stage-panel="workflow">
+              <div class="panel-head">
+                <div>
+                  <div class="stage-kicker">
+                    <span class="pill">阶段一</span>
+                    <span class="pill case">listing #18 法式奶油风陶瓷花瓶</span>
+                    <span class="pill warn">固定流程局限</span>
+                  </div>
+                  <h3>Workflow：先跑通上架闭环</h3>
+                  <p class="stage-summary">这一阶段证明 AI 可以从货源生成标题、卖点、主图、详情图和属性，但产物仍然像固定模板。它解决的是“流程能不能跑通”，还没有解决“是否真正理解商品素材”。</p>
+                </div>
+                <div class="panel-facts">
+                  <div class="fact">
+                    <b>解决了什么</b>
+                    <p>把货源到上架素材的确定步骤串起来，形成第一个可复现闭环。</p>
+                  </div>
+                  <div class="fact">
+                    <b>暴露了什么</b>
+                    <p>卖点泛化，图片叙事弱，主图和详情图缺少针对商品特征的取舍。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="case-story">
+                <div class="story-item">
+                  <b>为什么是这个 case</b>
+                  <p>花瓶素材足够典型，可以看到固定流程在标题、卖点和图片组织上的模板感。</p>
+                </div>
+                <div class="story-item">
+                  <b>阶段价值</b>
+                  <p>先证明系统能完整走完一条 listing 链路，再暴露出质量瓶颈。</p>
+                </div>
+                <div class="story-item">
+                  <b>下一步原因</b>
+                  <p>货源素材差异需要动态判断，单靠固定 workflow 不够。</p>
+                </div>
+              </div>
+
+              <section class="architecture-map" aria-label="Workflow 阶段架构">
+                <h4>这一阶段的架构</h4>
+                <div class="arch-steps">
+                  <div class="arch-step" data-arch-step="1">
+                    <b>货源输入</b>
+                    <p>读取链接、基础图和商品属性，按固定字段进入流程。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="2">
+                    <b>固定 Workflow</b>
+                    <p>标题、卖点、主图、详情图按预设步骤顺序生成。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="3">
+                    <b>模板化产出</b>
+                    <p>每一步都有结果，但缺少对素材角色的动态判断。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="4">
+                    <b>人工判断问题</b>
+                    <p>需要人发现“能生成”和“能发布”之间的质量差距。</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="evidence-board" aria-label="Workflow 阶段证据">
+                <div class="evidence-table">
+                  <h4>真实 case 证据</h4>
+                  <div class="evidence-row">
+                    <b>标题/卖点</b>
+                    <span>表达能成立，但容易落到“高颜值、百搭、性价比”这类泛化卖点。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>图片表达</b>
+                    <span>主图和详情图有数量，但更像按模板摆放素材，缺少明确购买理由。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>系统边界</b>
+                    <span>Workflow 负责执行步骤，不负责重新判断每张素材该承担什么信息任务。</span>
+                  </div>
+                </div>
+                <div class="problem-callout">
+                  <b>为什么进入下一阶段</b>
+                  <p>下一步不是多写几个 prompt，而是让 Agent 能看货源、判断素材，再决定要调用哪些工具。</p>
+                </div>
+              </section>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>主图组</h4>
+                  <p>5 张方图，展示这一阶段可生成但仍偏模板化的视觉结果。</p>
+                </div>
+                <div class="main-gallery" data-gallery="main">
+                  <a class="media-tile" href="assets/workflow/main_1.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶主图 1"><img src="assets/workflow/main_1.png" alt="Workflow 花瓶主图 1" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/workflow/main_2.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶主图 2"><img src="assets/workflow/main_2.png" alt="Workflow 花瓶主图 2" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/workflow/main_3.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶主图 3"><img src="assets/workflow/main_3.png" alt="Workflow 花瓶主图 3" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/workflow/main_4.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶主图 4"><img src="assets/workflow/main_4.png" alt="Workflow 花瓶主图 4" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/workflow/main_5.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶主图 5"><img src="assets/workflow/main_5.png" alt="Workflow 花瓶主图 5" data-gallery-image="main"></a>
+                </div>
+              </div>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>详情图组</h4>
+                  <p>11 张详情图完整展开，用来对照 workflow 阶段的表达密度和商品理解程度。</p>
+                </div>
+                <div class="detail-gallery" data-gallery="detail">
+                  <a class="media-tile" href="assets/workflow/detail_1.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 1"><img src="assets/workflow/detail_1.png" alt="Workflow 花瓶详情图 1" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_2.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 2"><img src="assets/workflow/detail_2.png" alt="Workflow 花瓶详情图 2" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_3.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 3"><img src="assets/workflow/detail_3.png" alt="Workflow 花瓶详情图 3" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_4.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 4"><img src="assets/workflow/detail_4.png" alt="Workflow 花瓶详情图 4" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_5.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 5"><img src="assets/workflow/detail_5.png" alt="Workflow 花瓶详情图 5" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_6.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 6"><img src="assets/workflow/detail_6.png" alt="Workflow 花瓶详情图 6" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_7.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 7"><img src="assets/workflow/detail_7.png" alt="Workflow 花瓶详情图 7" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_8.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 8"><img src="assets/workflow/detail_8.png" alt="Workflow 花瓶详情图 8" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_9.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 9"><img src="assets/workflow/detail_9.png" alt="Workflow 花瓶详情图 9" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_10.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 10"><img src="assets/workflow/detail_10.png" alt="Workflow 花瓶详情图 10" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/workflow/detail_11.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：Workflow 花瓶详情图 11"><img src="assets/workflow/detail_11.png" alt="Workflow 花瓶详情图 11" data-gallery-image="detail"></a>
+                </div>
+              </div>
+            </article>
+            <!-- stage-panel:workflow:end -->
+
+            <!-- stage-panel:single-agent:start -->
+            <article class="stage-panel" id="stage-panel-single-agent" role="tabpanel" aria-labelledby="stage-tab-single-agent" data-stage-panel="single-agent" hidden>
+              <div class="panel-head">
+                <div>
+                  <div class="stage-kicker">
+                    <span class="pill">阶段二</span>
+                    <span class="pill case">listing #55 棉麻桌布</span>
+                    <span class="pill warn">半成品问题</span>
+                  </div>
+                  <h3>单 Agent + 多工具：给 Agent 手和眼睛</h3>
+                  <p class="stage-summary">Agent 开始主动浏览货源、调用 VLM、生成背景、渲染图片和做合规检查。它获得了工具能力，但一个 Agent 同时负责研究、策略、文案、属性、图片和质检，交付仍然不稳。</p>
+                </div>
+                <div class="panel-facts">
+                  <div class="fact">
+                    <b>解决了什么</b>
+                    <p>系统能根据货源情况选择工具，不再只执行固定步骤。</p>
+                  </div>
+                  <div class="fact">
+                    <b>暴露了什么</b>
+                    <p>正文为空、字段质量不均衡，工具调用能力没有自动变成稳定交付。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="case-story">
+                <div class="story-item">
+                  <b>为什么是这个 case</b>
+                  <p>桌布 case 能看到工具增强后的视觉产物，也能看到内容字段没有被整体收口。</p>
+                </div>
+                <div class="story-item">
+                  <b>阶段价值</b>
+                  <p>Agent 有了“看”和“做”的能力，开始动态处理不同货源。</p>
+                </div>
+                <div class="story-item">
+                  <b>下一步原因</b>
+                  <p>需要把研究、策略、文案、图片和质检拆成更清楚的阶段合同。</p>
+                </div>
+              </div>
+
+              <section class="architecture-map" aria-label="单 Agent 阶段架构">
+                <h4>这一阶段的架构</h4>
+                <div class="arch-steps">
+                  <div class="arch-step" data-arch-step="1">
+                    <b>单个 Agent</b>
+                    <p>一个 Agent 同时理解商品、规划卖点、生成文案和图片。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="2">
+                    <b>多工具调用</b>
+                    <p>浏览、看图、背景生成、图片渲染和合规检查都接入同一循环。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="3">
+                    <b>局部变强</b>
+                    <p>视觉产物明显更具体，但字段完整性和最终收口不稳定。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="4">
+                    <b>难以定位责任</b>
+                    <p>出问题时很难判断是研究、策略、文案、图片还是质检没做好。</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="evidence-board" aria-label="单 Agent 阶段证据">
+                <div class="evidence-table">
+                  <h4>真实 case 证据</h4>
+                  <div class="evidence-row">
+                    <b>工具能力</b>
+                    <span>主图已经能呈现不同场景、尺寸和卖点，比固定 workflow 更会“做图”。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>内容缺口</b>
+                    <span>历史记录里正文为空，说明工具调用成功不等于 listing package 完整。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>系统边界</b>
+                    <span>一个 Agent 背太多标准，输出失败时缺少清晰的阶段合同来定位问题。</span>
+                  </div>
+                </div>
+                <div class="problem-callout">
+                  <b>为什么进入下一阶段</b>
+                  <p>需要把“谁负责理解商品、谁负责文案、谁负责图片、谁负责质检”拆开。</p>
+                </div>
+              </section>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>主图组</h4>
+                  <p>5 张方图，展示单 Agent 调用工具后的可视化能力。</p>
+                </div>
+                <div class="main-gallery" data-gallery="main">
+                  <a class="media-tile" href="assets/single-agent/main_1.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布主图 1"><img src="assets/single-agent/main_1.png" alt="单 Agent 桌布主图 1" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/single-agent/main_2.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布主图 2"><img src="assets/single-agent/main_2.png" alt="单 Agent 桌布主图 2" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/single-agent/main_3.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布主图 3"><img src="assets/single-agent/main_3.png" alt="单 Agent 桌布主图 3" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/single-agent/main_4.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布主图 4"><img src="assets/single-agent/main_4.png" alt="单 Agent 桌布主图 4" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/single-agent/main_5.png" target="_blank" rel="noopener" data-zoom-link data-problem-image aria-label="打开大图：单 Agent 桌布主图 5"><span class="media-label">问题样张</span><img src="assets/single-agent/main_5.png" alt="单 Agent 桌布主图 5" data-gallery-image="main"></a>
+                </div>
+              </div>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>详情图组</h4>
+                  <p>8 张详情图和长图资产，展示“有工具但没完全收口”的阶段状态。</p>
+                </div>
+                <div class="detail-gallery" data-gallery="detail">
+                  <a class="media-tile" href="assets/single-agent/detail_1.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 1"><img src="assets/single-agent/detail_1.png" alt="单 Agent 桌布详情图 1" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/single-agent/detail_2.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 2"><img src="assets/single-agent/detail_2.png" alt="单 Agent 桌布详情图 2" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/single-agent/detail_3.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 3"><img src="assets/single-agent/detail_3.png" alt="单 Agent 桌布详情图 3" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/single-agent/detail_4.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 4"><img src="assets/single-agent/detail_4.png" alt="单 Agent 桌布详情图 4" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/single-agent/detail_5.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 5"><img src="assets/single-agent/detail_5.png" alt="单 Agent 桌布详情图 5" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/single-agent/detail_6.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 6"><img src="assets/single-agent/detail_6.png" alt="单 Agent 桌布详情图 6" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/single-agent/detail_7.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 7"><img src="assets/single-agent/detail_7.png" alt="单 Agent 桌布详情图 7" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/single-agent/detail_8.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：单 Agent 桌布详情图 8"><img src="assets/single-agent/detail_8.png" alt="单 Agent 桌布详情图 8" data-gallery-image="detail"></a>
+                </div>
+              </div>
+
+              <div class="gallery-section">
+                <div class="full-detail">
+                  <div>
+                    <h4>详情长图</h4>
+                    <p>这一版已经能产出完整长图，但仍需要后续阶段把内容完整性和最终检查做成稳定机制。</p>
+                  </div>
+                  <div class="media-tile"><img src="assets/single-agent/detail_full.jpg" alt="单 Agent 桌布详情长图"></div>
+                </div>
+              </div>
+            </article>
+            <!-- stage-panel:single-agent:end -->
+
+            <!-- stage-panel:multi-agent:start -->
+            <article class="stage-panel" id="stage-panel-multi-agent" role="tabpanel" aria-labelledby="stage-tab-multi-agent" data-stage-panel="multi-agent" hidden>
+              <div class="panel-head">
+                <div>
+                  <div class="stage-kicker">
+                    <span class="pill">阶段三</span>
+                    <span class="pill case">listing #94 小夜灯</span>
+                    <span class="pill warn">Artifact 风险</span>
+                  </div>
+                  <h3>多专职 Agent：拆清职责和阶段合同</h3>
+                  <p class="stage-summary">商品理解、竞品、关键词、策略、文案、属性、图片规划和质检被拆成专职阶段，产物结构明显更完整。但规划正确不代表最终图片一定可发布，Judge 高分也可能漏掉 artifact 层面的硬伤。</p>
+                </div>
+                <div class="panel-facts">
+                  <div class="fact">
+                    <b>解决了什么</b>
+                    <p>职责边界更清楚，正文、卖点证据、主图布局和详情图数量更稳定。</p>
+                  </div>
+                  <div class="fact">
+                    <b>暴露了什么</b>
+                    <p>系统能规划，也能分工，但还不能稳定保证最终资产达标。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="case-story">
+                <div class="story-item">
+                  <b>为什么是这个 case</b>
+                  <p>小夜灯 case 展示了专职 Agent 之后更完整的图片与文案结构。</p>
+                </div>
+                <div class="story-item">
+                  <b>阶段价值</b>
+                  <p>把复杂任务拆成可观察、可检查、可替换的多个职责阶段。</p>
+                </div>
+                <div class="story-item">
+                  <b>下一步原因</b>
+                  <p>需要围绕最终文件反复执行、验证和修正，而不是只做阶段产出。</p>
+                </div>
+              </div>
+
+              <section class="architecture-map" aria-label="多专职 Agent 阶段架构">
+                <h4>这一阶段的架构</h4>
+                <div class="arch-steps">
+                  <div class="arch-step" data-arch-step="1">
+                    <b>商品理解 Agent</b>
+                    <p>先抽取商品事实、场景、材质、尺寸和人群。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="2">
+                    <b>策略/文案 Agent</b>
+                    <p>把商品事实变成标题、卖点、属性和详情页话术。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="3">
+                    <b>图片规划 Agent</b>
+                    <p>拆分主图、详情图的信息任务，生成更完整的视觉结构。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="4">
+                    <b>Judge / 质检</b>
+                    <p>检查阶段产物，但仍可能漏掉最终 artifact 的硬伤。</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="evidence-board" aria-label="多专职 Agent 阶段证据">
+                <div class="evidence-table">
+                  <h4>真实 case 证据</h4>
+                  <div class="evidence-row">
+                    <b>结构提升</b>
+                    <span>主图和详情图围绕不同卖点展开，能看出“先规划再生成”的痕迹。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>剩余风险</b>
+                    <span>规划和评分可以通过，但最终图片仍可能有空白、裁切或表达不达标的问题。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>系统边界</b>
+                    <span>多 Agent 解决分工，不等于解决最终文件的持续验证和修正。</span>
+                  </div>
+                </div>
+                <div class="problem-callout">
+                  <b>为什么进入下一阶段</b>
+                  <p>需要一个围绕最终交付物工作的执行 harness，把检查、修正和文件上下文纳入循环。</p>
+                </div>
+              </section>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>主图组</h4>
+                  <p>5 张方图，体现多专职 Agent 后更完整的视觉规划。</p>
+                </div>
+                <div class="main-gallery" data-gallery="main">
+                  <a class="media-tile" href="assets/multi-agent/main_1.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯主图 1"><img src="assets/multi-agent/main_1.png" alt="多专职 Agent 小夜灯主图 1" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/multi-agent/main_2.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯主图 2"><img src="assets/multi-agent/main_2.png" alt="多专职 Agent 小夜灯主图 2" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/multi-agent/main_3.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯主图 3"><img src="assets/multi-agent/main_3.png" alt="多专职 Agent 小夜灯主图 3" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/multi-agent/main_4.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯主图 4"><img src="assets/multi-agent/main_4.png" alt="多专职 Agent 小夜灯主图 4" data-gallery-image="main"></a>
+                  <a class="media-tile" href="assets/multi-agent/main_5.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯主图 5"><img src="assets/multi-agent/main_5.png" alt="多专职 Agent 小夜灯主图 5" data-gallery-image="main"></a>
+                </div>
+              </div>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>详情图组</h4>
+                  <p>8 张详情图，展示职责拆分后更完整的商品卖点展开。</p>
+                </div>
+                <div class="detail-gallery" data-gallery="detail">
+                  <a class="media-tile" href="assets/multi-agent/detail_1.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 1"><img src="assets/multi-agent/detail_1.png" alt="多专职 Agent 小夜灯详情图 1" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/multi-agent/detail_2.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 2"><img src="assets/multi-agent/detail_2.png" alt="多专职 Agent 小夜灯详情图 2" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/multi-agent/detail_3.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 3"><img src="assets/multi-agent/detail_3.png" alt="多专职 Agent 小夜灯详情图 3" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/multi-agent/detail_4.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 4"><img src="assets/multi-agent/detail_4.png" alt="多专职 Agent 小夜灯详情图 4" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/multi-agent/detail_5.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 5"><img src="assets/multi-agent/detail_5.png" alt="多专职 Agent 小夜灯详情图 5" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/multi-agent/detail_6.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 6"><img src="assets/multi-agent/detail_6.png" alt="多专职 Agent 小夜灯详情图 6" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/multi-agent/detail_7.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 7"><img src="assets/multi-agent/detail_7.png" alt="多专职 Agent 小夜灯详情图 7" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="assets/multi-agent/detail_8.png" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：多专职 Agent 小夜灯详情图 8"><img src="assets/multi-agent/detail_8.png" alt="多专职 Agent 小夜灯详情图 8" data-gallery-image="detail"></a>
+                </div>
+              </div>
+            </article>
+            <!-- stage-panel:multi-agent:end -->
+
+            <!-- stage-panel:sdk:start -->
+            <article class="stage-panel" id="stage-panel-sdk" role="tabpanel" aria-labelledby="stage-tab-sdk" data-stage-panel="sdk" hidden>
+              <div class="panel-head">
+                <div>
+                  <div class="stage-kicker">
+                    <span class="pill">阶段四</span>
+                    <span class="pill case">桌布 HTML demo</span>
+                    <span class="pill">最终展示</span>
+                  </div>
+                  <h3>Claude Agent SDK：围绕交付物工作</h3>
+                  <p class="stage-summary">SDK 阶段不再继续堆角色，而是把业务经验写成 skill/playbook，让 Agent loop 围绕最终资产执行、检查、修正和交付。公开展示只放已确认的桌布 HTML demo，不再列多个 SDK 候选。</p>
+                </div>
+                <div class="panel-facts">
+                  <div class="fact">
+                    <b>解决了什么</b>
+                    <p>把长任务执行、文件上下文和验证循环交给成熟 harness。</p>
+                  </div>
+                  <div class="fact">
+                    <b>交付形态</b>
+                    <p>标题、属性、5 张主图、8 屏详情图和详情长图。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="case-story">
+                <div class="story-item">
+                  <b>为什么是这个 case</b>
+                  <p>桌布 demo 是已经确认的最终展示素材，适合代表 SDK 版的公开交付形态。</p>
+                </div>
+                <div class="story-item">
+                  <b>阶段价值</b>
+                  <p>工具层保持薄封装，复杂判断沉淀到 playbook 和执行循环。</p>
+                </div>
+                <div class="story-item">
+                  <b>展示口径</b>
+                  <p>这是可复核、可发布、可讲解的一套 listing package。</p>
+                </div>
+              </div>
+
+              <section class="architecture-map" aria-label="Claude Agent SDK 阶段架构">
+                <h4>这一阶段的架构</h4>
+                <div class="arch-steps">
+                  <div class="arch-step" data-arch-step="1">
+                    <b>业务 Playbook</b>
+                    <p>把上架规则、图片标准和质检经验沉淀成可复用 skill。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="2">
+                    <b>Agent Loop</b>
+                    <p>围绕目标资产持续执行、读取文件、调用工具和修正结果。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="3">
+                    <b>Artifact 检查</b>
+                    <p>不只看中间 JSON，也检查最终 HTML、图片和详情长图。</p>
+                  </div>
+                  <div class="arch-step" data-arch-step="4">
+                    <b>可发布交付</b>
+                    <p>输出一套能被打开、复核、讲解和继续迭代的 listing package。</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="evidence-board" aria-label="Claude Agent SDK 阶段证据">
+                <div class="evidence-table">
+                  <h4>真实 case 证据</h4>
+                  <div class="evidence-row">
+                    <b>最终资产</b>
+                    <span>桌布 demo 包含标题、属性、5 张主图、8 屏详情图和详情长图。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>展示重点</b>
+                    <span>这里展示的是一套完整 listing package，而不是多个候选结果的罗列。</span>
+                  </div>
+                  <div class="evidence-row">
+                    <b>系统边界</b>
+                    <span>SDK 版把经验沉淀进 playbook 和执行循环，降低长任务交付的不确定性。</span>
+                  </div>
+                </div>
+                <div class="problem-callout">
+                  <b>为什么作为最终展示</b>
+                  <p>它能代表当前阶段的核心能力：围绕最终资产执行、验证、修正并交付。</p>
+                </div>
+              </section>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>主图组</h4>
+                  <p>5 张最终主图，代表当前可公开展示的 SDK 交付效果。</p>
+                </div>
+                <div class="main-gallery" data-gallery="main">
+                  <a class="media-tile" href="../demo/assets/main_1.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布主图 1"><img src="../demo/assets/main_1.jpg" alt="SDK 桌布主图 1" data-gallery-image="main"></a>
+                  <a class="media-tile" href="../demo/assets/main_2.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布主图 2"><img src="../demo/assets/main_2.jpg" alt="SDK 桌布主图 2" data-gallery-image="main"></a>
+                  <a class="media-tile" href="../demo/assets/main_3.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布主图 3"><img src="../demo/assets/main_3.jpg" alt="SDK 桌布主图 3" data-gallery-image="main"></a>
+                  <a class="media-tile" href="../demo/assets/main_4.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布主图 4"><img src="../demo/assets/main_4.jpg" alt="SDK 桌布主图 4" data-gallery-image="main"></a>
+                  <a class="media-tile" href="../demo/assets/main_5.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布主图 5"><img src="../demo/assets/main_5.jpg" alt="SDK 桌布主图 5" data-gallery-image="main"></a>
+                </div>
+              </div>
+
+              <div class="gallery-section">
+                <div class="gallery-head">
+                  <h4>详情图组</h4>
+                  <p>8 屏详情图完整展示，和最终 demo 使用同一组静态资产。</p>
+                </div>
+                <div class="detail-gallery" data-gallery="detail">
+                  <a class="media-tile" href="../demo/assets/detail_01.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 1"><img src="../demo/assets/detail_01.jpg" alt="SDK 桌布详情图 1" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="../demo/assets/detail_02.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 2"><img src="../demo/assets/detail_02.jpg" alt="SDK 桌布详情图 2" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="../demo/assets/detail_03.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 3"><img src="../demo/assets/detail_03.jpg" alt="SDK 桌布详情图 3" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="../demo/assets/detail_04.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 4"><img src="../demo/assets/detail_04.jpg" alt="SDK 桌布详情图 4" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="../demo/assets/detail_05.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 5"><img src="../demo/assets/detail_05.jpg" alt="SDK 桌布详情图 5" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="../demo/assets/detail_06.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 6"><img src="../demo/assets/detail_06.jpg" alt="SDK 桌布详情图 6" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="../demo/assets/detail_07.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 7"><img src="../demo/assets/detail_07.jpg" alt="SDK 桌布详情图 7" data-gallery-image="detail"></a>
+                  <a class="media-tile" href="../demo/assets/detail_08.jpg" target="_blank" rel="noopener" data-zoom-link aria-label="打开大图：SDK 桌布详情图 8"><img src="../demo/assets/detail_08.jpg" alt="SDK 桌布详情图 8" data-gallery-image="detail"></a>
+                </div>
+              </div>
+
+              <div class="gallery-section">
+                <div class="full-detail">
+                  <div>
+                    <h4>详情长图</h4>
+                    <p>最终阶段的关键不是多一个 Agent，而是能把可发布资产完整生成、检查并交付。</p>
+                    <p><a href="../demo/">查看桌布 HTML demo</a></p>
+                  </div>
+                  <div class="media-tile"><img src="../demo/assets/detail_full.jpg" alt="SDK 桌布详情长图"></div>
+                </div>
+              </div>
+            </article>
+            <!-- stage-panel:sdk:end -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="summary-band">
+          <div>
+            <h2>核心不是“用了几个 Agent”</h2>
+            <p>Workflow、单 Agent、多 Agent、Claude Agent SDK 不是谁天然更高级。它们分别对应不同问题：先跑通闭环，再获得工具能力，再拆清职责，最后补齐围绕最终交付物的验证和修正循环。</p>
+          </div>
+          <div class="link-stack">
+            <a class="button" href="../demo/">查看最终桌布 Demo</a>
+            <a class="button secondary" href="../">返回项目首页</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">商品上架内容生成 Agent 案例 · 静态演进展示页</div>
+  </footer>
+
+  <script>
+    (() => {
+      const tabs = Array.from(document.querySelectorAll('[data-stage-target]'));
+      const panels = Array.from(document.querySelectorAll('[data-stage-panel]'));
+
+      function activateStage(stageId, shouldFocus = false) {
+        tabs.forEach((tab) => {
+          const isActive = tab.dataset.stageTarget === stageId;
+          tab.setAttribute('aria-selected', String(isActive));
+          tab.tabIndex = isActive ? 0 : -1;
+          if (isActive && shouldFocus) tab.focus();
+        });
+
+        panels.forEach((panel) => {
+          panel.hidden = panel.dataset.stagePanel !== stageId;
+        });
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateStage(tab.dataset.stageTarget));
+        tab.addEventListener('keydown', (event) => {
+          const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+          if (!keys.includes(event.key)) return;
+
+          event.preventDefault();
+          const lastIndex = tabs.length - 1;
+          let nextIndex = index;
+
+          if (event.key === 'Home') nextIndex = 0;
+          if (event.key === 'End') nextIndex = lastIndex;
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = index === 0 ? lastIndex : index - 1;
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = index === lastIndex ? 0 : index + 1;
+
+          activateStage(tabs[nextIndex].dataset.stageTarget, true);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

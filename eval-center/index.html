@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>货郎评测中心 Demo</title>
+  <style>
+    :root {
+      --bg: #11100d;
+      --surface: #191814;
+      --surface2: #211f1a;
+      --surface3: #29251e;
+      --border: #3a3428;
+      --text: #eee9df;
+      --muted: #aaa193;
+      --subtle: #756d60;
+      --accent: #ff7a1a;
+      --teal: #2dd4bf;
+      --green: #36d77b;
+      --red: #ff4d4d;
+      --yellow: #eab308;
+      --blue: #60a5fa;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+    .app { min-height: 100vh; display: flex; }
+    .sidebar {
+      width: 212px;
+      flex: 0 0 212px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .brand { padding: 23px 18px 17px; border-bottom: 1px solid var(--border); }
+    .brand-title { font-size: 15px; font-weight: 780; }
+    .brand-sub { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .nav { padding: 10px 0; }
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      color: var(--muted);
+      font-size: 13px;
+      border-left: 2px solid transparent;
+    }
+    .nav a.active { color: var(--text); background: var(--surface2); border-left-color: var(--accent); }
+    .nav-icon {
+      width: 16px;
+      height: 16px;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 9px;
+      flex: 0 0 16px;
+    }
+    .mobile-bar { display: none; }
+    .main { flex: 1; min-width: 0; padding: 32px; }
+    .wrap { max-width: 1460px; margin: 0 auto; }
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    h1 { margin: 0; font-size: 22px; line-height: 1.25; font-weight: 780; }
+    h2 { margin: 0; font-size: 18px; line-height: 1.3; }
+    .subtitle { color: var(--muted); font-size: 13px; line-height: 1.65; margin-top: 5px; max-width: 780px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      background: var(--surface2);
+      padding: 8px 13px;
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      font-weight: 760;
+      margin: 0 0 12px;
+    }
+    .section-note { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .grid { display: grid; gap: 14px; }
+    .metrics { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 20px; }
+    .cards4 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+    .two-col { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+    .three-col { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .panel, .card, .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .panel { padding: 18px; }
+    .card { padding: 16px; display: block; }
+    .metric { padding: 17px 18px; min-height: 118px; }
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: 760;
+    }
+    .muted { color: var(--muted); }
+    .subtle { color: var(--subtle); }
+    .green { color: var(--green); }
+    .red { color: var(--red); }
+    .orange { color: var(--accent); }
+    .yellow { color: var(--yellow); }
+    .blue { color: var(--blue); }
+    .teal { color: var(--teal); }
+    .label { color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .big { font-size: 28px; font-weight: 780; margin-top: 9px; line-height: 1; }
+    .unit { color: var(--muted); font-size: 12px; font-weight: 500; margin-left: 3px; }
+    .hint { color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 8px; }
+    .row-link {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+    }
+    .row-link:first-child { border-top: 0; padding-top: 2px; }
+    .num {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 760;
+    }
+    .table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .table th {
+      color: var(--muted);
+      font-weight: 650;
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table td {
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.45;
+    }
+    .table tr:hover td { background: rgba(255,255,255,0.015); }
+    .badge, .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .badge.success { color: var(--green); border-color: rgba(54,215,123,0.35); }
+    .badge.failed { color: var(--red); border-color: rgba(255,77,77,0.35); }
+    .badge.partial { color: var(--accent); border-color: rgba(255,122,26,0.35); }
+    .badge.running { color: var(--blue); border-color: rgba(96,165,250,0.35); }
+    .bar-row { display: grid; grid-template-columns: 92px 1fr 42px; gap: 10px; align-items: center; font-size: 12px; color: var(--muted); margin: 10px 0; }
+    .track { height: 7px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
+    .fill { height: 100%; border-radius: 4px; background: var(--accent); }
+    .back { color: var(--muted); font-size: 12px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .chip {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .img-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; }
+    .mock-img {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), transparent 18%),
+        linear-gradient(135deg, #4a3526, #151411 48%, #2a4a42);
+      display: flex;
+      align-items: flex-end;
+      padding: 8px;
+      color: rgba(255,255,255,0.75);
+      font-size: 11px;
+      min-height: 92px;
+    }
+    .mock-img.alt { background: radial-gradient(circle at 68% 32%, rgba(255,255,255,0.15), transparent 18%), linear-gradient(135deg, #263849, #11100d 50%, #4a3026); }
+    .mock-img.warn { background: radial-gradient(circle at 50% 28%, rgba(255,255,255,0.12), transparent 20%), linear-gradient(135deg, #4b2323, #171411 48%, #433119); }
+    .tabs { display: flex; flex-wrap: wrap; gap: 7px; margin: 16px 0; }
+    .tab {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 7px 11px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .tab.active { background: rgba(255,122,26,0.18); color: var(--text); border-color: rgba(255,122,26,0.55); }
+    .kv {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 8px 12px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .kv span { color: var(--muted); }
+    .code {
+      border: 1px solid var(--border);
+      background: #0d0c0a;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      background: #0d0c0a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      font-size: 13px;
+      max-width: 360px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .18s, transform .18s;
+      z-index: 50;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 40;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: min(720px, 100%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
+    .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .field.full { grid-column: 1 / -1; }
+    .demo-ribbon {
+      position: fixed;
+      top: 12px;
+      right: 14px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      background: rgba(25,24,20,0.9);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      z-index: 10;
+    }
+    @media (max-width: 980px) {
+      .sidebar { display: none; }
+      .app { display: block; }
+      .mobile-bar {
+        display: block;
+        position: sticky;
+        top: 0;
+        z-index: 9;
+        background: rgba(17,16,13,0.96);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 16px 10px;
+        backdrop-filter: blur(12px);
+      }
+      .mobile-brand { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+      .mobile-brand b { font-size: 16px; }
+      .mobile-brand span { color: var(--muted); font-size: 11px; }
+      .mobile-nav {
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+      .mobile-nav a {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 7px 10px;
+        color: var(--muted);
+        background: var(--surface);
+        font-size: 12px;
+      }
+      .mobile-nav a.active {
+        color: var(--text);
+        border-color: rgba(255,122,26,0.55);
+        background: rgba(255,122,26,0.16);
+      }
+      .main { padding: 22px 16px 80px; }
+      .topline { flex-direction: column; }
+      .actions { justify-content: flex-start; }
+      .form-grid { grid-template-columns: 1fr; }
+      .table-wrap { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-ribbon">Portfolio static demo</div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-title">评测中心</div>
+        <div class="brand-sub">Diagnostic Harness</div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+    </aside>
+    <header class="mobile-bar">
+      <div class="mobile-brand"><b>评测中心</b><span>Diagnostic Harness</span></div>
+      <nav class="mobile-nav" id="mobile-nav"></nav>
+    </header>
+    <main class="main"><div class="wrap" id="app"></div></main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="modal-backdrop" id="modal"></div>
+
+  <script>
+    const data = {
+      datasets: [
+        { id: "listing-quality-v1", name: "5月15日真实上架质量回归集", version: "v1.3", case_count: 5, status: "active", created_at: "2026-05-15 10:20", description: "覆盖 Agent SDK 真实生成的上架内容，重点观察图片质量、事实一致性和详情页说服力。" },
+        { id: "image-risk-cases", name: "图片质量专项集", version: "v0.8", case_count: 8, status: "active", created_at: "2026-05-18 16:42", description: "收录主图重复、详情页 filler、功能证明不足等图片问题 case。" },
+        { id: "baseline-archive", name: "4月基线归档", version: "v1.0", case_count: 12, status: "archived", created_at: "2026-04-09 02:00", description: "早期 eval harness 基线数据，保留用于趋势对比。" },
+      ],
+      cases: [
+        { id: "166", category: "家居照明", difficulty: "hard", source_quality: "rich", title: "拍拍感应调光小夜灯", source_url: "https://demo.1688.com/item/166", listing_url: "https://demo.merx.local/listings/166", issue: "高质量 case 仍暴露首图证明力不足", snapshot: 92, images: 11, attrs: 18 },
+        { id: "168", category: "厨房收纳", difficulty: "medium", source_quality: "rich", title: "台面多功能收纳架", source_url: "https://demo.1688.com/item/168", listing_url: "https://demo.merx.local/listings/168", issue: "整体可用，但详情页卖点层次不足", snapshot: 88, images: 10, attrs: 16 },
+        { id: "155", category: "装饰摆件", difficulty: "hard", source_quality: "medium", title: "桌面装饰收纳托盘", source_url: "https://demo.1688.com/item/155", listing_url: "https://demo.merx.local/listings/155", issue: "主图和详情图基于同一张图重复生产", snapshot: 73, images: 6, attrs: 12 },
+        { id: "154", category: "清洁用品", difficulty: "medium", source_quality: "medium", title: "可折叠清洁刷套装", source_url: "https://demo.1688.com/item/154", listing_url: "https://demo.merx.local/listings/154", issue: "标题转化弱，事实描述基本准确", snapshot: 80, images: 8, attrs: 14 },
+        { id: "167", category: "浴室收纳", difficulty: "hard", source_quality: "sparse", title: "免打孔浴室置物架", source_url: "https://demo.1688.com/item/167", listing_url: "https://demo.merx.local/listings/167", issue: "详情图缺少承重/尺寸证明", snapshot: 67, images: 5, attrs: 9 },
+      ],
+      runs: [
+        { id: "run-20260515", name: "Real Listing Eval - 2026-05-15T20:13:02", dataset_id: "listing-quality-v1", platform: "all", trigger: "manual", agent_version: "agent-sdk-v2.4", status: "completed", progress_completed: 5, progress_total: 5, progress_failed: 2, created_at: "2026-05-15 20:13", pass_rate: 80, quality_score: 78.8, health_score: 73.5 },
+        { id: "run-20260514", name: "Agent SDK baseline - 2026-05-14", dataset_id: "listing-quality-v1", platform: "all", trigger: "manual", agent_version: "agent-sdk-v2.3", status: "completed", progress_completed: 3, progress_total: 3, progress_failed: 3, created_at: "2026-05-14 22:30", pass_rate: 0, quality_score: 0, health_score: 0 },
+        { id: "run-20260409", name: "April baseline regression", dataset_id: "baseline-archive", platform: "all", trigger: "auto_daily", agent_version: "legacy-agent", status: "completed", progress_completed: 5, progress_total: 5, progress_failed: 4, created_at: "2026-04-09 02:00", pass_rate: 20, quality_score: 42, health_score: 41 },
+      ],
+      results: [
+        { id: "res-166", run_id: "run-20260515", case_id: "166", platform: "taobao", status: "partial", duration_ms: 182000, outcome: 90, grounding: 82, listing: 76, process: 88, blocker: 0, warning: 2, image: 68, copy: 86, factual: 78, issue_codes: ["main_image_proof_weak", "detail_filler"], summary: "首图没有证明“拍拍/感应/调光”核心能力；详情页参数表、售后页偏 filler，功能证明不足。" },
+        { id: "res-168", run_id: "run-20260515", case_id: "168", platform: "taobao", status: "success", duration_ms: 165000, outcome: 96, grounding: 88, listing: 82, process: 90, blocker: 0, warning: 1, image: 78, copy: 88, factual: 86, issue_codes: ["detail_hierarchy_weak"], summary: "主图方向正确，台面场景清楚；详情页卖点层次仍可加强，尺寸和使用前后对比不足。" },
+        { id: "res-155", run_id: "run-20260515", case_id: "155", platform: "taobao", status: "failed", duration_ms: 149000, outcome: 72, grounding: 76, listing: 55, process: 81, blocker: 1, warning: 2, image: 42, copy: 79, factual: 74, issue_codes: ["image_repetition", "detail_image_low_variety"], summary: "主图与详情图明显基于同一张图反复生成，素材多样性不足，会影响购买判断。" },
+        { id: "res-154", run_id: "run-20260515", case_id: "154", platform: "taobao", status: "success", duration_ms: 132000, outcome: 90, grounding: 86, listing: 83, process: 84, blocker: 0, warning: 0, image: 80, copy: 82, factual: 87, issue_codes: ["title_conversion_weak"], summary: "基础质量可发布；标题吸引力偏弱，清洁场景的痛点表达不够具体。" },
+        { id: "res-167", run_id: "run-20260515", case_id: "167", platform: "taobao", status: "failed", duration_ms: 171000, outcome: 74, grounding: 72, listing: 58, process: 78, blocker: 1, warning: 2, image: 48, copy: 76, factual: 70, issue_codes: ["detail_proof_missing", "source_sparse"], summary: "源图较少时 Agent 没有补足证明链，详情页缺少承重、尺寸和安装路径证据。" },
+      ],
+      reports: [
+        { id: "report-20260515", run_id: "run-20260515", report_date: "2026-05-15", total_cases: 5, health_score: 73.5, pass_rate: 80, quality_score: 78.8, fatal_failures: 2, warning_failures: 5, ai_analysis: "核心问题集中在图片证明力与详情页证据链：Agent 能生成较完整的标题、属性和文案，但主图角色分工不稳定，详情页容易用参数表、售后页、白底确认页填充篇幅。建议下一轮强化 image_plan 与 render 阶段的一致性检查，增加“主图必须证明核心卖点”“详情页每屏必须提供购买证据”的评分约束。" },
+        { id: "report-20260409", run_id: "run-20260409", report_date: "2026-04-09", total_cases: 5, health_score: 41, pass_rate: 20, quality_score: 42, fatal_failures: 4, warning_failures: 0, ai_analysis: "早期版本主要失败在事实锚定与流程完整性：属性缺失、图片数量不足、详情页结构不完整，导致上架内容难以直接发布。" },
+      ],
+      taxonomy: [
+        { code: "image_repetition", category: "image_quality", stage: "render", root: "主图/详情图复用同一视觉素材", cases: 3, fix: "增加素材多样性与图像相似度检查" },
+        { code: "main_image_proof_weak", category: "image_quality", stage: "image_plan", root: "首图没有证明核心功能", cases: 2, fix: "要求首图绑定最强购买理由" },
+        { code: "detail_filler", category: "conversion", stage: "detail_plan", root: "详情页屏幕承担的信息价值不足", cases: 4, fix: "每屏必须绑定证据/场景/参数/对比之一" },
+        { code: "factual_gap", category: "grounding", stage: "fact_extract", root: "源信息缺失或未被引用", cases: 2, fix: "先做事实抽取，再生成文案和图像计划" },
+      ],
+    };
+
+    const navItems = [
+      ["/", "主页", "H"],
+      ["/datasets", "数据集", "D"],
+      ["/tasks", "实验", "E"],
+      ["/analysis", "诊断分析", "A"],
+      ["/reports", "值班报告", "R"],
+    ];
+    const state = { resultTab: "compare", filterStatus: "" };
+    let lastRenderedPath = "";
+
+    const $ = (s) => document.querySelector(s);
+    const app = $("#app");
+    const toastEl = $("#toast");
+    const modal = $("#modal");
+    const path = () => (location.hash.replace(/^#/, "") || "/").split("?")[0];
+    const route = (to) => { location.hash = to; };
+    const fmt = (v, fallback = "—") => v === null || v === undefined || v === "" ? fallback : v;
+    const statusBadge = (status) => `<span class="badge ${status}">${({completed:"completed",success:"success",partial:"partial",failed:"failed",running:"running",pending:"pending",active:"active",archived:"archived"}[status] || status)}</span>`;
+    const caseById = (id) => data.cases.find(c => c.id === id);
+    const runById = (id) => data.runs.find(r => r.id === id);
+    const reportById = (id) => data.reports.find(r => r.id === id);
+    const resultById = (id) => data.results.find(r => r.id === id);
+    const datasetById = (id) => data.datasets.find(d => d.id === id);
+    const pctColor = (n) => n >= 85 ? "green" : n >= 65 ? "orange" : "red";
+    const imageIssueCount = () => data.results.reduce((n, r) => n + r.issue_codes.filter(c => /image|main|detail|filler|proof/.test(c)).length, 0);
+    const showToast = (msg) => {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      clearTimeout(showToast.t);
+      showToast.t = setTimeout(() => toastEl.classList.remove("show"), 2400);
+    };
+    const showModal = (title, body, primary = "确认") => {
+      modal.innerHTML = `
+        <div class="modal">
+          <div class="panel-title"><span>${title}</span><button class="btn" data-close-modal>关闭</button></div>
+          ${body}
+          <div class="actions"><button class="btn" data-close-modal>取消</button><button class="btn primary" data-demo-action>${primary}</button></div>
+        </div>`;
+      modal.classList.add("show");
+    };
+    const cardMetric = (label, value, unit, hint, cls = "") => `
+      <div class="metric">
+        <div class="label">${label}</div>
+        <div class="big ${cls}">${value}<span class="unit">${unit || ""}</span></div>
+        <div class="hint">${hint}</div>
+      </div>`;
+    const panelMetric = (label, value, cls = "") => `
+      <div class="card" style="min-height:auto">
+        <div class="label">${label}</div>
+        <div style="font-size:22px;font-weight:760;margin-top:6px" class="${cls}">${value}</div>
+      </div>`;
+    const imgTiles = (labels, warn = false) => `<div class="img-grid">${labels.map((x, i) => `<div class="mock-img ${warn ? "warn" : i % 2 ? "alt" : ""}">${x}</div>`).join("")}</div>`;
+    const bars = (items) => items.map(([label, val, cls]) => `<div class="bar-row"><span>${label}</span><div class="track"><div class="fill" style="width:${val}%;${cls ? `background:var(--${cls})` : ""}"></div></div><b class="${cls || ""}">${val}</b></div>`).join("");
+    const shell = (content) => content;
+
+    function renderNav() {
+      const current = path();
+      const navHtml = navItems.map(([href, label, icon]) => {
+        const active = href === "/" ? current === "/" : current.startsWith(href);
+        return `<a href="#${href}" class="${active ? "active" : ""}"><span class="nav-icon">${icon}</span>${label}</a>`;
+      }).join("");
+      $("#nav").innerHTML = navHtml;
+      $("#mobile-nav").innerHTML = navHtml;
+    }
+
+    function renderHome() {
+      const report = data.reports[0];
+      const run = runById(report.run_id);
+      return shell(`
+        <div class="topline">
+          <div>
+            <h1>评测中心</h1>
+            <div class="subtitle">面向多模态 Listing Agent 迭代的诊断式 Eval Harness</div>
+          </div>
+          <div class="actions">
+            <button class="btn" data-route="/analysis">查看诊断</button>
+            <button class="btn primary" data-route="/tasks">新建实验</button>
+          </div>
+        </div>
+
+        <section>
+          <div class="section-head"><span>最新一轮实验概览</span><span class="section-note">${run.name}</span></div>
+          <div class="grid metrics">
+            ${cardMetric("最新质量分", report.quality_score, "/100", "来自最新一轮已完成实验：2026-05-15", "orange")}
+            ${cardMetric("图片质量问题", imageIssueCount(), "个", "统计主图、详情图、素材重复和视觉证明力相关问题", "red")}
+            ${cardMetric("事实一致性风险", report.fatal_failures, "个 FATAL", `${report.warning_failures} 个 WARNING 作为辅助风险信号`, "red")}
+            ${cardMetric("当前覆盖", data.cases.length, "个 case", `${data.datasets.length} 个数据集，${data.runs.length} 次实验`, "")}
+          </div>
+        </section>
+
+        <div class="grid two-col" style="margin-bottom:20px">
+          <section class="panel">
+            <div class="panel-title"><span>当前建议动作</span><span class="section-note">按当前评测状态生成</span></div>
+            ${[
+              ["优先复查图片链路", "最新一轮实验仍发现图片相关问题，建议先看诊断分析里的图片质量、素材重复和详情页证明力。", "/analysis", "查看诊断"],
+              ["沉淀回归数据集", "把高质量 case、低质量 case 和争议 case 固定下来，让每次 Agent 改动都能复测同一批样本。", "/datasets/listing-quality-v1", "管理数据集"],
+              ["生成本轮值班报告", "将实验结果汇总成健康分、问题模式和改进建议，方便对齐下一轮修什么。", "/reports/report-20260515", "查看值班报告"],
+            ].map((a, i) => `<a class="row-link" href="#${a[2]}"><span class="num">${i+1}</span><span><b>${a[0]}</b><span class="hint" style="display:block">${a[1]}</span></span><span class="orange">${a[3]} →</span></a>`).join("")}
+          </section>
+          <section class="panel">
+            <div class="panel-title"><span>最新实验</span><span class="section-note">${report.total_cases} 个用例</span></div>
+            <div class="grid cards4" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+              ${panelMetric("健康分", report.health_score, "orange")}
+              ${panelMetric("通过率", report.pass_rate + "%", "green")}
+              ${panelMetric("质量分", report.quality_score, "")}
+              ${panelMetric("失败", `${report.fatal_failures}/${report.warning_failures}`, "red")}
+            </div>
+            <div class="hint" style="font-size:12px;line-height:1.75;border-top:1px solid var(--border);padding-top:12px">${report.ai_analysis}</div>
+            <a href="#/reports/${report.id}" class="orange" style="display:inline-block;margin-top:12px;font-size:12px">查看完整报告 →</a>
+          </section>
+        </div>
+
+        <section>
+          <div class="section-head"><span>评测闭环</span><span class="section-note">真实 case → 可复现实验 → 诊断问题模式 → 汇总报告</span></div>
+          <div class="grid cards4">
+            ${[
+              ["/datasets", "数据集", "管理测试用例集，支持手动录入和 CSV 批量导入。", `${data.datasets.length} 个数据集`],
+              ["/tasks", "实验", "每次 Agent、prompt 或工具改动都沉淀成可复现实验。", `${data.runs.length} 次实验`],
+              ["/analysis", "诊断分析", "实验对比、Failure Coding、回归热点都从 case 诊断沉淀出来。", `${imageIssueCount()} 个图片问题`],
+              ["/reports", "值班报告", "每日自动评测汇总，AI 分析问题模式，每天 02:00 自动生成。", `最新 ${report.report_date}`],
+            ].map(([href, label, desc, foot]) => `<a class="card" href="#${href}"><h2>${label}</h2><div class="hint" style="min-height:40px">${desc}</div><div class="orange" style="font-size:12px;margin-top:14px;font-weight:650">${foot}</div></a>`).join("")}
+          </div>
+        </section>
+      `);
+    }
+
+    function renderDatasets() {
+      return `
+        <div class="topline"><div><h1>数据集</h1><div class="subtitle">管理测试用例集，支持手动录入和 CSV 批量导入</div></div><div class="actions"><button class="btn" data-demo-action>导入 CSV</button><button class="btn primary" data-modal="dataset">创建数据集</button></div></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>数据集名称</th><th>版本</th><th>用例数</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead><tbody>
+        ${data.datasets.map(ds => `<tr><td><a class="orange" href="#/datasets/${ds.id}"><b>${ds.name}</b></a><div class="hint">${ds.description}</div></td><td>${ds.version}</td><td><b>${ds.case_count}</b></td><td>${statusBadge(ds.status)}</td><td class="muted">${ds.created_at}</td><td><a class="orange" href="#/datasets/${ds.id}">查看 →</a></td></tr>`).join("")}
+        </tbody></table></div>`;
+    }
+
+    function renderDatasetDetail(id) {
+      const ds = datasetById(id) || data.datasets[0];
+      return `
+        <a class="back" href="#/datasets">‹ 返回数据集列表</a>
+        <div class="topline"><div><h1>${ds.name}</h1><div class="subtitle">${ds.description} · ${ds.version} · ${ds.case_count} 个用例</div></div><div class="actions"><button class="btn" data-demo-action>补齐快照</button><button class="btn" data-demo-action>下载模板</button><button class="btn" data-demo-action>导入 CSV</button><button class="btn primary" data-modal="case">添加用例</button></div></div>
+        <div class="filters"><button class="chip active">所有品类</button><button class="chip">家居照明</button><button class="chip">厨房收纳</button><button class="chip">装饰摆件</button><button class="chip">hard</button></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Case</th><th>品类</th><th>难度</th><th>货源质量</th><th>Source Snapshot</th><th>上架链接</th><th>备注</th><th>操作</th></tr></thead><tbody>
+          ${data.cases.map(c => `<tr><td><b>${c.title}</b><div class="hint">${c.source_url}</div></td><td>${c.category}</td><td>${c.difficulty}</td><td>${c.source_quality}</td><td><span class="badge success">${c.snapshot}/100</span><div class="hint">${c.attrs} attrs · ${c.images} imgs</div></td><td><a href="${c.listing_url}" class="orange">${c.id}</a></td><td>${c.issue}</td><td><a class="orange" href="#/tasks/run-20260515/results/res-${c.id}">看诊断 →</a></td></tr>`).join("")}
+        </tbody></table></div>`;
+    }
+
+    function renderTasks() {
+      return `
+        <div class="topline"><div><h1>实验</h1><div class="subtitle">每次 Agent、prompt 或工具改动都沉淀成可复现实验</div></div><div class="actions"><button class="btn" data-demo-action>刷新</button><button class="btn primary" data-modal="task">新建实验</button></div></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>实验</th><th>平台</th><th>触发方式</th><th>状态</th><th>进度</th><th>Outcome</th><th>Grounding</th><th>Listing</th><th>操作</th></tr></thead><tbody>
+        ${data.runs.map(run => `<tr><td><a class="orange" href="#/tasks/${run.id}"><b>${run.name}</b></a><div class="hint">${run.agent_version}</div></td><td>${run.platform}</td><td>${run.trigger}</td><td>${statusBadge(run.status)}</td><td>${run.progress_completed}/${run.progress_total}</td><td class="${pctColor(run.pass_rate)}"><b>${run.pass_rate}%</b></td><td class="${pctColor(run.quality_score)}"><b>${run.quality_score}</b></td><td class="${pctColor(run.health_score)}"><b>${run.health_score}</b></td><td><a class="orange" href="#/tasks/${run.id}">查看 →</a></td></tr>`).join("")}
+        </tbody></table></div>`;
+    }
+
+    function renderTaskDetail(id) {
+      const run = runById(id) || data.runs[0];
+      const results = data.results.filter(r => r.run_id === run.id);
+      const visible = state.filterStatus ? results.filter(r => r.status === state.filterStatus) : results;
+      return `
+        <a class="back" href="#/tasks">‹ 返回实验</a>
+        <div class="topline"><div><h1>${run.name}</h1><div class="subtitle">Agent 版本: ${run.agent_version} · 平台: ${run.platform} · 触发: ${run.trigger}</div></div><div class="actions"><button class="btn" data-demo-action>失败转回归集</button><button class="btn primary" data-demo-action>生成值班报告</button></div></div>
+        <div class="grid cards4" style="margin-bottom:18px">
+          ${panelMetric("状态", statusBadge(run.status))}
+          ${panelMetric("进度", `${run.progress_completed}/${run.progress_total}`)}
+          ${panelMetric("失败", run.progress_failed, run.progress_failed ? "red" : "green")}
+          ${panelMetric("Blocker 通过率", run.pass_rate + "%", pctColor(run.pass_rate))}
+        </div>
+        <div class="panel" style="margin-bottom:14px"><div class="section-head"><span>总体进度</span><span>${Math.round(run.progress_completed / run.progress_total * 100)}%</span></div><div class="track"><div class="fill" style="width:${Math.round(run.progress_completed / run.progress_total * 100)}%"></div></div></div>
+        <div class="filters">${["", "success", "partial", "failed"].map(s => `<button class="chip ${state.filterStatus === s ? "active" : ""}" data-filter="${s}">${s || "全部"} (${s ? results.filter(r => r.status === s).length : results.length})</button>`).join("")}</div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Case</th><th>平台</th><th>状态</th><th>Outcome</th><th>Grounding</th><th>Listing</th><th>Process</th><th>耗时</th><th>操作</th></tr></thead><tbody>
+        ${visible.map(r => { const c = caseById(r.case_id); return `<tr><td><b>${c.category}</b><div class="hint">${c.title}</div></td><td>淘宝</td><td>${statusBadge(r.status)}</td><td class="${pctColor(r.outcome)}"><b>${r.outcome}%</b></td><td class="${pctColor(r.grounding)}"><b>${r.grounding}%</b></td><td class="${pctColor(r.listing)}"><b>${r.listing}%</b></td><td class="${pctColor(r.process)}"><b>${r.process}%</b></td><td class="muted">${(r.duration_ms/1000).toFixed(1)}s</td><td><a class="orange" href="#/tasks/${run.id}/results/${r.id}">详情 →</a></td></tr>`; }).join("")}
+        </tbody></table></div>`;
+    }
+
+    function renderResultDetail(runId, resultId) {
+      const r = resultById(resultId) || data.results[0];
+      const c = caseById(r.case_id);
+      const tabs = [["compare","产物对比"],["images","图像诊断"],["grounding","文案 Grounding"],["trace","Agent Trace"],["graders","Grader 结果"],["ai","AI 分析"],["review","人工审核"]];
+      const tab = state.resultTab;
+      const sourceAttrs = { "材质": "ABS / 金属", "尺寸": "约 18×9×6cm", "颜色": "白色 / 灰色", "供货": "48小时发货", "起批": "2件" };
+      const outputAttrs = { "商品标题": `${c.title} 家用多场景高颜值实用款`, "适用空间": c.category, "核心卖点": r.issue_codes.includes("image_repetition") ? "同图多角度展示" : "场景化展示 + 参数说明", "建议售价": "39.9-69.9" };
+      let body = "";
+      if (tab === "compare") body = `<div class="grid three-col"><section class="panel"><div class="panel-title">Source Snapshot</div>${imgTiles(["源图1","源图2","源图3","源图4"])}<div class="kv" style="margin-top:14px">${Object.entries(sourceAttrs).map(([k,v])=>`<span>${k}</span><b>${v}</b>`).join("")}</div></section><section class="panel"><div class="panel-title">Agent Listing</div><h2>${outputAttrs["商品标题"]}</h2><div class="hint" style="margin:12px 0">围绕真实使用场景生成标题、属性、主图和详情页。当前 case 的主要问题：${r.summary}</div><div class="kv">${Object.entries(outputAttrs).map(([k,v])=>`<span>${k}</span><b>${v}</b>`).join("")}</div></section><section class="panel"><div class="panel-title">诊断摘要</div>${panelMetric("Trusted Blocker", r.blocker, r.blocker ? "red" : "green")}${panelMetric("Warnings", r.warning, r.warning ? "orange" : "green")}<div class="hint">${r.summary}</div></section></div>`;
+      if (tab === "images") body = `<div class="grid two-col"><section class="panel"><div class="panel-title">主图序列</div>${imgTiles(["首图","卖点图","场景图","尺寸图","白底图"], r.image < 60)}</section><section class="panel"><div class="panel-title">图片质量诊断</div>${bars([["图片质量", r.image, r.image < 60 ? "red" : "orange"],["文案质量", r.copy, "green"],["事实一致性", r.factual, "yellow"]])}<div class="hint">${r.summary}</div></section></div>`;
+      if (tab === "grounding") body = `<section class="panel"><div class="panel-title">文案 Grounding</div><table class="table"><thead><tr><th>Claim</th><th>Source Evidence</th><th>Verdict</th></tr></thead><tbody><tr><td>商品适合${c.category}场景</td><td>源页标题与图片场景匹配</td><td>${statusBadge("success")}</td></tr><tr><td>支持核心功能证明</td><td>${r.issue_codes.includes("main_image_proof_weak") ? "源图可见，但主图没有表达" : "主图和详情页均有表达"}</td><td>${statusBadge(r.issue_codes.includes("main_image_proof_weak") ? "partial" : "success")}</td></tr><tr><td>参数完整可信</td><td>${c.snapshot}/100 source snapshot</td><td>${statusBadge(c.snapshot > 75 ? "success" : "partial")}</td></tr></tbody></table></section>`;
+      if (tab === "trace") body = `<section class="panel"><div class="panel-title">Agent Trace</div><div class="code">1. fetch_source_package: completed\n2. extract_facts: ${c.snapshot > 70 ? "completed" : "needs_review"}\n3. image_plan: ${r.image < 70 ? "weak_signal" : "completed"}\n4. render_images: completed\n5. listing_copy: completed\n6. eval_harness: ${r.status}</div></section>`;
+      if (tab === "graders") body = `<section class="panel"><div class="panel-title">Grader 结果</div><table class="table"><thead><tr><th>Grader</th><th>Severity</th><th>Verdict</th><th>Reason</th></tr></thead><tbody><tr><td>main_image_quality</td><td>warning</td><td>${r.image >= 75 ? statusBadge("success") : statusBadge("failed")}</td><td>${r.summary}</td></tr><tr><td>copy_conversion_quality</td><td>warning</td><td>${r.copy >= 75 ? statusBadge("success") : statusBadge("partial")}</td><td>文案转化表达基本可用</td></tr><tr><td>factual_accuracy</td><td>blocker</td><td>${r.blocker ? statusBadge("failed") : statusBadge("success")}</td><td>事实锚定风险 ${r.blocker}</td></tr></tbody></table></section>`;
+      if (tab === "ai") body = `<section class="panel"><div class="panel-title">AI 分析</div><div class="hint" style="font-size:13px;line-height:1.8">${r.summary} 建议把该 case 纳入固定回归，并在下一轮 Agent prompt 中要求每张主图/详情图必须承担明确角色。</div><div style="margin-top:12px"><button class="btn primary" data-demo-action>重新生成 AI 分析</button></div></section>`;
+      if (tab === "review") body = `<section class="panel"><div class="panel-title">人工审核</div><div class="grid three-col">${["是否可发布","是否达到竞品水平","你会点击吗"].map(x=>`<div class="card"><b>${x}</b><div class="filters" style="margin-top:10px"><button class="chip">是</button><button class="chip active">否</button></div></div>`).join("")}</div><div style="margin-top:14px"><textarea style="width:100%;min-height:92px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:10px">${r.summary}</textarea></div><button class="btn primary" data-demo-action style="margin-top:10px">保存审核</button></section>`;
+      return `<a class="back" href="#/tasks/${runId}">‹ 返回实验详情</a><div class="topline"><div><h1>淘宝 · ${c.category}</h1><div class="subtitle">${runById(runId).name} · ${c.title} · ${statusBadge(r.status)}</div></div><div class="actions"><button class="btn" data-demo-action>刷新</button><button class="btn primary" data-demo-action>生成 AI 分析</button></div></div><div class="grid cards4" style="margin-bottom:16px">${panelMetric("Outcome", r.outcome + "%", pctColor(r.outcome))}${panelMetric("Grounding", r.grounding + "%", pctColor(r.grounding))}${panelMetric("Listing Quality", r.listing + "%", pctColor(r.listing))}${panelMetric("Process", r.process + "%", pctColor(r.process))}</div><div class="tabs">${tabs.map(([k,label])=>`<button class="tab ${tab===k?"active":""}" data-result-tab="${k}">${label}</button>`).join("")}</div>${body}`;
+    }
+
+    function renderAnalysis() {
+      const rootCounts = data.taxonomy;
+      return `
+        <div class="topline"><div><h1>诊断分析</h1><div class="subtitle">实验对比、Failure Coding、回归热点都从 case 诊断沉淀出来</div></div><button class="btn" data-demo-action>刷新</button></div>
+        <section class="panel" style="margin-bottom:16px"><div class="panel-title">实验对比</div><table class="table"><thead><tr><th>实验</th><th>Outcome</th><th>Grounding</th><th>Listing</th><th>Top Failures</th></tr></thead><tbody>${data.runs.map(r=>`<tr><td><a class="orange" href="#/tasks/${r.id}"><b>${r.name}</b></a><div class="hint">${r.agent_version}</div></td><td class="${pctColor(r.pass_rate)}"><b>${r.pass_rate}%</b></td><td class="${pctColor(r.quality_score)}"><b>${r.quality_score}</b></td><td class="${pctColor(r.health_score)}"><b>${r.health_score}</b></td><td><span class="pill">image_repetition</span> <span class="pill">detail_filler</span></td></tr>`).join("")}</tbody></table></section>
+        <div class="grid two-col"><section class="panel"><div class="panel-title">Root Cause Hotspots</div>${rootCounts.map(t=>`<div class="bar-row"><span>${t.code}</span><div class="track"><div class="fill" style="width:${Math.min(t.cases*22,100)}%"></div></div><b class="orange">${t.cases}</b></div>`).join("")}</section><section class="panel"><div class="panel-title">Failure Coding Queue</div><table class="table"><thead><tr><th>Case</th><th>实验</th><th>AI 推荐 Code</th><th>操作</th></tr></thead><tbody>${data.results.filter(r=>r.status!=="success").map(r=>`<tr><td>${caseById(r.case_id).title}<div class="hint">${r.summary}</div></td><td>${runById(r.run_id).name}</td><td>${r.issue_codes.map(c=>`<span class="pill">${c}</span>`).join(" ")}</td><td><a class="orange" href="#/tasks/${r.run_id}/results/${r.id}">诊断 →</a></td></tr>`).join("")}</tbody></table></section></div>
+        <section class="panel" style="margin-top:16px"><div class="panel-title">Failure Taxonomy</div><table class="table"><thead><tr><th>Code</th><th>Category</th><th>Stage</th><th>Root Cause</th><th>Cases</th><th>Suggested Fix</th></tr></thead><tbody>${data.taxonomy.map(t=>`<tr><td><span class="pill">${t.code}</span></td><td>${t.category}</td><td>${t.stage}</td><td>${t.root}</td><td class="orange"><b>${t.cases}</b></td><td>${t.fix}</td></tr>`).join("")}</tbody></table></section>`;
+    }
+
+    function renderReports() {
+      return `<div class="topline"><div><h1>值班报告</h1><div class="subtitle">每日自动评测汇总，AI 分析问题模式，每天 02:00 自动生成</div></div></div><div class="grid">${data.reports.map(r=>`<a class="panel" href="#/reports/${r.id}"><div class="panel-title"><span>值班报告 — ${r.report_date}</span><span class="${pctColor(r.health_score)}" style="font-size:26px">${r.health_score}</span></div><div class="grid cards4">${panelMetric("通过率", r.pass_rate + "%", pctColor(r.pass_rate))}${panelMetric("质量分", r.quality_score, pctColor(r.quality_score))}${panelMetric("FATAL 失败", r.fatal_failures, r.fatal_failures ? "red" : "green")}${panelMetric("WARNING 失败", r.warning_failures, r.warning_failures ? "orange" : "green")}</div><div class="hint" style="font-size:12px;line-height:1.7;margin-top:12px;border-top:1px solid var(--border);padding-top:10px">${r.ai_analysis.slice(0,220)}...</div></a>`).join("")}</div>`;
+    }
+
+    function renderReportDetail(id) {
+      const r = reportById(id) || data.reports[0];
+      const run = runById(r.run_id);
+      const resultRows = data.results.filter(x => x.run_id === run.id);
+      return `<a class="back" href="#/reports">‹ 返回报告列表</a><div class="topline"><div><h1>值班报告 — ${r.report_date}</h1><div class="subtitle">${run.name} · ${r.total_cases} 个用例 · ${run.platform}</div></div><div style="text-align:right"><div class="big ${pctColor(r.health_score)}" style="font-size:36px">${r.health_score}</div><div class="label">健康分/100</div></div></div><div class="grid cards4" style="margin-bottom:20px">${panelMetric("发布通过率", r.pass_rate + "%", pctColor(r.pass_rate))}${panelMetric("上架质量分", r.quality_score, pctColor(r.quality_score))}${panelMetric("FATAL 失败", r.fatal_failures, r.fatal_failures ? "red":"green")}${panelMetric("WARNING 失败", r.warning_failures, r.warning_failures ? "orange":"green")}</div><section class="panel" style="margin-bottom:20px"><div class="panel-title">AI 问题分析</div><div class="hint" style="font-size:13px;line-height:1.8">${r.ai_analysis}</div></section><section class="panel" style="margin-bottom:20px"><div class="panel-title">上架质量诊断</div>${bars([["图片质量", 68, "red"],["文案质量", 86, "green"],["事实一致性", 74, "yellow"],["转化表达", 81, "teal"]])}<table class="table" style="margin-top:14px"><thead><tr><th>Case</th><th>质量分</th><th>主要问题</th><th>操作</th></tr></thead><tbody>${resultRows.map(x=>`<tr><td>${caseById(x.case_id).title}</td><td class="${pctColor(x.listing)}"><b>${x.listing}</b></td><td>${x.summary}</td><td><a class="orange" href="#/tasks/${x.run_id}/results/${x.id}">查看 →</a></td></tr>`).join("")}</tbody></table></section><section class="panel"><div class="panel-title">各维度通过率</div><div class="grid three-col">${["main_image_quality","detail_page_quality","copy_conversion_quality","factual_accuracy","process_quality","title_appeal"].map((g,i)=>panelMetric(g, [62,70,86,78,84,82][i] + "%", pctColor([62,70,86,78,84,82][i]))).join("")}</div></section>`;
+    }
+
+    function renderNotFound() {
+      return `<div class="panel"><h1>页面不存在</h1><div class="subtitle">这个静态 demo 没有对应路由。</div><button class="btn primary" data-route="/">回首页</button></div>`;
+    }
+
+    function render() {
+      renderNav();
+      const p = path();
+      if (p !== lastRenderedPath) {
+        modal.classList.remove("show");
+        modal.innerHTML = "";
+        lastRenderedPath = p;
+      }
+      let html = "";
+      if (p === "/") html = renderHome();
+      else if (p === "/datasets") html = renderDatasets();
+      else if (p.startsWith("/datasets/")) html = renderDatasetDetail(p.split("/")[2]);
+      else if (p === "/tasks") html = renderTasks();
+      else if (/^\/tasks\/[^/]+\/results\/[^/]+$/.test(p)) { const [, , runId, , resultId] = p.split("/"); html = renderResultDetail(runId, resultId); }
+      else if (p.startsWith("/tasks/")) html = renderTaskDetail(p.split("/")[2]);
+      else if (p === "/analysis") html = renderAnalysis();
+      else if (p === "/reports") html = renderReports();
+      else if (p.startsWith("/reports/")) html = renderReportDetail(p.split("/")[2]);
+      else html = renderNotFound();
+      app.innerHTML = html;
+      window.scrollTo(0, 0);
+    }
+
+    document.addEventListener("click", (event) => {
+      const routeEl = event.target.closest("[data-route]");
+      if (routeEl) { event.preventDefault(); route(routeEl.dataset.route); return; }
+      const actionEl = event.target.closest("[data-demo-action]");
+      if (actionEl) { event.preventDefault(); showToast("演示模式：这个操作不会写入数据库，但真实系统中会触发对应流程。"); return; }
+      const modalEl = event.target.closest("[data-modal]");
+      if (modalEl) {
+        event.preventDefault();
+        if (modalEl.dataset.modal === "dataset") showModal("创建数据集", `<div class="form-grid"><div class="field"><label>数据集名称</label><input value="图片质量专项回归集"></div><div class="field"><label>版本</label><input value="v1.0"></div><div class="field full"><label>描述</label><textarea>收录图片重复、主图证明力不足、详情页 filler 等 case。</textarea></div></div>`, "创建");
+        if (modalEl.dataset.modal === "case") showModal("添加测试用例", `<div class="form-grid"><div class="field full"><label>1688 货源页 URL</label><input value="https://demo.1688.com/item/new-case"></div><div class="field"><label>品类</label><select><option>家居照明</option><option>厨房收纳</option></select></div><div class="field"><label>难度</label><select><option>hard</option><option>medium</option></select></div></div>`, "保存");
+        if (modalEl.dataset.modal === "task") showModal("新建评测实验", `<div class="form-grid"><div class="field full"><label>实验名称</label><input value="Agent SDK 图片质量回归"></div><div class="field"><label>数据集</label><select><option>5月15日真实上架质量回归集</option></select></div><div class="field"><label>平台</label><select><option>全平台</option><option>淘宝</option></select></div><div class="field"><label>Agent 版本标记</label><input value="agent-sdk-vNext"></div></div>`, "启动实验");
+        return;
+      }
+      if (event.target.closest("[data-close-modal]") || event.target === modal) { modal.classList.remove("show"); return; }
+      const filter = event.target.closest("[data-filter]");
+      if (filter) { state.filterStatus = filter.dataset.filter; render(); return; }
+      const tab = event.target.closest("[data-result-tab]");
+      if (tab) { state.resultTab = tab.dataset.resultTab; render(); return; }
+    });
+
+    window.addEventListener("hashchange", render);
+    if (!location.hash) location.hash = "/";
+    render();
+  </script>
+</body>
+</html>
