@@ -1,0 +1,46 @@
+{
+  "case_id": "tablecloth-sdk-delivery",
+  "product_subject": "棉麻彩色桌布",
+  "stage": "Claude Agent SDK",
+  "assets": {
+    "main_images": [
+      {
+        "role": "铺桌首图",
+        "path": "../../evolution/assets/sdk/main_1.jpg"
+      },
+      {
+        "role": "尺寸规格",
+        "path": "../../evolution/assets/sdk/main_2.jpg"
+      },
+      {
+        "role": "面料纹理",
+        "path": "../../evolution/assets/sdk/main_3.jpg"
+      },
+      {
+        "role": "边缘垂坠",
+        "path": "../../evolution/assets/sdk/main_4.jpg"
+      },
+      {
+        "role": "浅底确认",
+        "path": "../../evolution/assets/sdk/main_5.jpg"
+      }
+    ],
+    "detail_images": [
+      "../../evolution/assets/sdk/detail_01.jpg",
+      "../../evolution/assets/sdk/detail_02.jpg",
+      "../../evolution/assets/sdk/detail_03.jpg",
+      "../../evolution/assets/sdk/detail_04.jpg",
+      "../../evolution/assets/sdk/detail_05.jpg",
+      "../../evolution/assets/sdk/detail_06.jpg",
+      "../../evolution/assets/sdk/detail_07.jpg",
+      "../../evolution/assets/sdk/detail_08.jpg"
+    ],
+    "detail_full": "../../evolution/assets/sdk/detail_full.jpg"
+  },
+  "checks": {
+    "main_image_count": 5,
+    "detail_image_count": 8,
+    "detail_full_required": true,
+    "buyer_visible_internal_terms_allowed": false
+  }
+}

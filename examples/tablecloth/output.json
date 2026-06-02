@@ -18,23 +18,23 @@
     ],
     "assets": {
       "main_images": [
-        "../../demo/assets/main_1.jpg",
-        "../../demo/assets/main_2.jpg",
-        "../../demo/assets/main_3.jpg",
-        "../../demo/assets/main_4.jpg",
-        "../../demo/assets/main_5.jpg"
+        "../../evolution/assets/sdk/main_1.jpg",
+        "../../evolution/assets/sdk/main_2.jpg",
+        "../../evolution/assets/sdk/main_3.jpg",
+        "../../evolution/assets/sdk/main_4.jpg",
+        "../../evolution/assets/sdk/main_5.jpg"
       ],
       "detail_images": [
-        "../../demo/assets/detail_01.jpg",
-        "../../demo/assets/detail_02.jpg",
-        "../../demo/assets/detail_03.jpg",
-        "../../demo/assets/detail_04.jpg",
-        "../../demo/assets/detail_05.jpg",
-        "../../demo/assets/detail_06.jpg",
-        "../../demo/assets/detail_07.jpg",
-        "../../demo/assets/detail_08.jpg"
+        "../../evolution/assets/sdk/detail_01.jpg",
+        "../../evolution/assets/sdk/detail_02.jpg",
+        "../../evolution/assets/sdk/detail_03.jpg",
+        "../../evolution/assets/sdk/detail_04.jpg",
+        "../../evolution/assets/sdk/detail_05.jpg",
+        "../../evolution/assets/sdk/detail_06.jpg",
+        "../../evolution/assets/sdk/detail_07.jpg",
+        "../../evolution/assets/sdk/detail_08.jpg"
       ],
-      "detail_full": "../../demo/assets/detail_full.jpg"
+      "detail_full": "../../evolution/assets/sdk/detail_full.jpg"
     }
   },
   "transformation_summary": [

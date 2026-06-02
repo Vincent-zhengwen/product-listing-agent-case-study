@@ -176,4 +176,4 @@ flowchart LR
 3. 多 Agent 不是默认更高级。只有当任务天然包含多个专业角色和不同评价标准时, 拆分职责才有价值。
 4. Agent 产品质量最终取决于 harness。上下文工程、权限边界、工具调用、验证闭环和交付检查, 决定了系统能否稳定产出。
 
-更多关于不同架构阶段产物问题如何推动迭代, 见 [评估与迭代经验](evaluation-and-lessons.md)。
+更多关于 SDK 阶段的工具边界和公开代码切片, 见 [Agent SDK 设计](agent-sdk-design.md)。不同架构阶段的质量边界, 见 [评估与迭代经验](evaluation-and-lessons.md)。

@@ -20,13 +20,13 @@
 生成图片位于:
 
 ```text
-demo/assets/main_1.jpg
-demo/assets/main_2.jpg
-demo/assets/main_3.jpg
-demo/assets/main_4.jpg
-demo/assets/main_5.jpg
-demo/assets/detail_01.jpg ... demo/assets/detail_08.jpg
-demo/assets/detail_full.jpg
+evolution/assets/sdk/main_1.jpg
+evolution/assets/sdk/main_2.jpg
+evolution/assets/sdk/main_3.jpg
+evolution/assets/sdk/main_4.jpg
+evolution/assets/sdk/main_5.jpg
+evolution/assets/sdk/detail_01.jpg ... evolution/assets/sdk/detail_08.jpg
+evolution/assets/sdk/detail_full.jpg
 ```
 
 ## 转换重点
@@ -43,4 +43,5 @@ demo/assets/detail_full.jpg
 
 - [input.json](input.json): 案例输入摘要。
 - [output.json](output.json): 生成结果摘要。
-- [demo/index.html](../../demo/index.html): 可直接打开的展示页面。
+- [artifact-manifest.json](artifact-manifest.json): 公开资产清单。
+- [四阶段架构演进页](../../evolution/index.html): 可直接打开的主展示页面。

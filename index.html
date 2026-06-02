@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>商品上架内容生成 Agent 案例</title>
+  <meta http-equiv="refresh" content="0; url=evolution/">
+  <title>商品上架 Agent 架构演进</title>
   <style>
     body {
       margin: 0;
@@ -14,91 +15,38 @@
       background: #f6f8fb;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
+
     main {
-      width: min(980px, calc(100% - 40px));
-      padding: 42px;
+      width: min(720px, calc(100% - 40px));
+      padding: 36px;
       border: 1px solid #d7dee8;
       border-radius: 8px;
-      background: #ffffff;
-      box-shadow: 0 16px 36px rgba(21, 24, 29, 0.12);
+      background: #fff;
     }
+
     h1 {
       margin: 0 0 12px;
-      font-size: 34px;
-      line-height: 1.16;
+      font-size: 30px;
+      line-height: 1.2;
       letter-spacing: 0;
     }
+
     p {
-      margin: 0 0 26px;
+      margin: 0;
       color: #5f6673;
       line-height: 1.7;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 14px;
-    }
-    .card {
-      display: flex;
-      flex-direction: column;
-      min-height: 186px;
-      padding: 20px;
-      border-radius: 8px;
-      border: 1px solid #d7dee8;
-      background: #ffffff;
-      color: inherit;
-      text-decoration: none;
-      transition: transform 0.16s ease, box-shadow 0.16s ease;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(21, 24, 29, 0.1);
-    }
-    .tag {
-      width: fit-content;
-      margin-bottom: 12px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: #e2eee9;
-      color: #145847;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    h2 {
-      margin: 0 0 8px;
-      font-size: 20px;
-      line-height: 1.25;
-    }
-    .card p {
-      margin: 0;
-      font-size: 14px;
-    }
-    .arrow {
-      margin-top: auto;
-      padding-top: 18px;
-      color: #16181d;
+
+    a {
+      color: #245c78;
       font-weight: 700;
     }
   </style>
 </head>
 <body>
   <main>
-    <h1>商品上架内容生成 Agent 案例</h1>
-    <p>这个公开案例展示一个从 B2B 货源到 C 端商品上架资产的 Agent 实践：既看最终产物，也看从 Workflow 到 Claude Agent SDK 的架构演进。</p>
-    <div class="grid">
-      <a class="card" href="demo/">
-        <span class="tag">Demo</span>
-        <h2>最终上架资产展示</h2>
-        <p>展示桌布案例的标题、属性、5 张主图、8 屏详情图和详情长图。</p>
-        <span class="arrow">查看最终 Demo</span>
-      </a>
-      <a class="card" href="evolution/">
-        <span class="tag">Architecture</span>
-        <h2>Agent 四阶段演进</h2>
-        <p>从固定 Workflow 到单 Agent、多专职 Agent，再到 Claude Agent SDK Harness。</p>
-        <span class="arrow">查看架构演进</span>
-      </a>
-    </div>
+    <h1>商品上架 Agent 架构演进</h1>
+    <p>正在进入四阶段架构演进案例。若页面没有自动跳转，请打开 <a href="evolution/">evolution/</a>。</p>
   </main>
 </body>
 </html>
